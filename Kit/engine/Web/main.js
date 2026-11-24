@@ -634,7 +634,7 @@ window.renderFrame = (f) => {
   // Keep the mascot in the sky margin as a channel signature, away from the action area.
   exportCtx.save();
   exportCtx.globalAlpha = 0.92;
-  exportCtx.drawImage(mascotCard, 34, 46, 74, 123);
+  exportCtx.drawImage(mascotCard, 30, 42, 88, 146);
   exportCtx.restore();
   return exportCanvas.toDataURL("image/jpeg", 0.95);
 };
