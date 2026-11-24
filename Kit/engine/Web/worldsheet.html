@@ -36,6 +36,7 @@ for (const frame of frames) {
   figure.append(img, caption);
   grid.append(figure);
 }
+await Promise.all([...grid.querySelectorAll("img")].map(img => img.decode()));
 status.textContent = frames.length + " views ready";
 window.done = true;
 </script>
