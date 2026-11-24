@@ -59,13 +59,13 @@ Keep the final script text. It drives the timing in Stage 4, so no speech recogn
 Do everything from here without stopping. Ask only if the timing cannot be resolved.
 
 ### 4.0 Get the kit
-The code kit ships **inside this skill folder** at `kit/` (engine, tools, the Mountain Man worked example, and `engine/web/toonbase.js`, the `toon.ts` Pen library from github.com/mromidev/claude-animated-shorts with its types already stripped, MIT). Locate the folder with `find / -name SKILL.md -path "*cartoon-audio-short*" 2>/dev/null` and treat its `kit/` as read-only.
+The code kit ships **inside this skill folder** at `Kit/` (engine, tools, the Mountain Man worked example, and `Kit/engine/Web/toonbase.js`, the `toon.ts` Pen library from github.com/mromidev/claude-animated-shorts with its types already stripped, MIT). Locate the folder with `find / -name SKILL.md -path "*cartoon-audio-short*" 2>/dev/null` and treat its `Kit/` as read-only.
 
-Then run `bash <skill>/kit/tools/setup.sh ~/shorts/<slug>`. It copies the engine and tools into the project, installs three.js r160 with npm, builds `web/toon.js` (`toonbase.js` + `cast.js`), and links the global Playwright. Only the three.js install needs the network.
+Then run `bash <skill>/Kit/tools/setup.sh ~/shorts/<slug>`. It copies the engine and tools into the project, installs three.js r160 with npm, builds `web/toon.js` (`toonbase.js` + `cast.js`), and links the global Playwright. Only the three.js install needs the network.
 - Requirements: Node 22.6+, Python 3 with numpy + Pillow, ffmpeg, and Playwright with Chromium (`npm i -g playwright && npx playwright install chromium` if missing).
 - If package registries are blocked, git over GitHub usually works. Never disable TLS or route around the proxy.
 - Chromium: use the pre-installed Playwright browser with `--use-angle=swiftshader --enable-unsafe-swiftshader --ignore-gpu-blocklist`. That gives CPU WebGL at about 3-10 s per frame (≈3.5 s on 2 cores, so a 42 s short is ~75 min of rendering).
-- **If `kit/` is missing** (a synced copy of the skill can carry only this SKILL.md), tell the user in one line and rebuild it: `git clone --depth 1 https://github.com/mromidev/claude-animated-shorts` for `templates/bridge/toon.ts` (strip types with `module.stripTypeScriptTypes` → `toonbase.js`) and `templates/audio/{dsp,instruments,sfx_gen}.py`, `npm i three@0.160.0`, then write the engine files listed under Architecture, keeping every Engine gotcha. Keep the rebuilt kit and offer it to the user as a zip so it can go back into the skill folder.
+- **If `Kit/` is missing** (a synced copy of the skill can carry only this SKILL.md), tell the user in one line and rebuild it: `git clone --depth 1 https://github.com/mromidev/claude-animated-shorts` for `templates/bridge/toon.ts` (strip types with `module.stripTypeScriptTypes` → `toonbase.js`) and `templates/audio/{dsp,instruments,sfx_gen}.py`, `npm i three@0.160.0`, then write the engine files listed under Architecture, keeping every Engine gotcha. Keep the rebuilt kit and offer it to the user as a zip so it can go back into the skill folder.
 
 ### 4.1 Timing
 Run `python3 timing.py voice.mp3 script.txt --out work`.
