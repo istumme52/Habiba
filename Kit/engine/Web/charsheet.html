@@ -1,6 +1,6 @@
 <!doctype html>
 <html>
-<head><meta charset="utf-8"><title>Character design sheet — 35 presets</title></head>
+<head><meta charset="utf-8"><title>Character design sheet — 35 story presets + channel mascot</title></head>
 <body style="margin:0;background:#9fb7d6">
 <canvas id="c" width="2400" height="9720"></canvas>
 <script type="module">
@@ -22,7 +22,7 @@ const cell = (i, j, draw, label) => {
   g.restore();
 };
 const presets = Object.entries(C).filter(([name, outfit]) =>
-  /^(MANJHI_[YMO]|FALGUNI|VIL_\d+|KID)$/.test(name) && outfit && typeof outfit === "object"
+  /^(MANJHI_[YMO]|FALGUNI|VIL_\d+|KID|CHANNEL_MASCOT)$/.test(name) && outfit && typeof outfit === "object"
 );
 const L = -Math.PI * 2 / 3;
 presets.forEach(([name, outfit], index) => {
