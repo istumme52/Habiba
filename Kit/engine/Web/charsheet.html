@@ -2,7 +2,7 @@
 <html>
 <head><meta charset="utf-8"><title>Character design sheet — 35 presets</title></head>
 <body style="margin:0;background:#9fb7d6">
-<canvas id="c" width="2400" height="8640"></canvas>
+<canvas id="c" width="2400" height="9720"></canvas>
 <script type="module">
 import * as T from "./toon.js";
 import * as C from "./castdefs.js";
@@ -45,7 +45,7 @@ const motionTests = [
   ["WOMAN WALK", p => T.bodySideX(p, C.FALGUNI, {mode:"walk", phase:0.65, pot:true, expr:"calm", seed:5, light:L})],
   ["CHILD WALK", p => T.bodySideX(p, C.KID, {mode:"walk", phase:0.2, expr:"soft", seed:9, light:L})]
 ];
-motionTests.forEach(([name, draw], i) => cell(i, 7, draw, name));
+motionTests.forEach(([name, draw], i) => cell(i, 8, draw, name));
 window.done = true;
 </script>
 </body>
