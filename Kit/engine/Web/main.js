@@ -4,12 +4,23 @@ import * as T from "./toon.js";
 import * as P from "./paint.js";
 import { ridgeH, terrainH, groundAt, chanEnd, W0, CH, fbm } from "./terrain.js";
 import { frameState, TOTAL, VILLAGE, ROAD, LANE, CLINIC, SHORT } from "./story.js";
+import { CHANNEL_MASCOT } from "./castdefs.js";
 
 const W = 1080, H = 1920, PX = W / 1080;
 const NOINK = 1;
 const canvas = document.createElement("canvas");
 canvas.width = W; canvas.height = H;
 document.body.appendChild(canvas);
+
+// Fixed channel identity: a small, consistent mascot stamp is composited into every exported frame.
+const mascotCard = document.createElement("canvas");
+mascotCard.width = 600; mascotCard.height = 1000;
+T.bodyFrontX(new T.Pen(mascotCard.getContext("2d")), CHANNEL_MASCOT, {
+  expr: "soft", armL: "hip", armR: "up", seed: 52, light: -2.35
+});
+const exportCanvas = document.createElement("canvas");
+exportCanvas.width = W; exportCanvas.height = H;
+const exportCtx = exportCanvas.getContext("2d");
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, preserveDrawingBuffer: true, powerPreference: "high-performance" });
 renderer.setPixelRatio(1);
 renderer.setSize(W, H, false);
@@ -618,7 +629,14 @@ window.renderFrame = (f) => {
   // pass 4: lens blur -> screen
   dofMat.uniforms.focus.value = S.dof.focus; dofMat.uniforms.cInf.value = window.NODOF ? 0 : S.dof.cInf * PX;
   fsQuad.material = dofMat; renderer.setRenderTarget(null); renderer.render(fsScene, fsCam);
-  return canvas.toDataURL("image/jpeg", 0.95);
+  exportCtx.clearRect(0, 0, W, H);
+  exportCtx.drawImage(canvas, 0, 0);
+  // Keep the mascot in the sky margin as a channel signature, away from the action area.
+  exportCtx.save();
+  exportCtx.globalAlpha = 0.92;
+  exportCtx.drawImage(mascotCard, 34, 46, 74, 123);
+  exportCtx.restore();
+  return exportCanvas.toDataURL("image/jpeg", 0.95);
 };
 window.TOTAL = TOTAL;
 window.dbgND = () => { const out = []; const buf = new Float32Array(4); for (const [x, y] of [[540, 1700], [540, 1200], [540, 900], [540, 700], [300, 300], [800, 1500]]) { renderer.readRenderTargetPixels(rtND, x, y, 1, 1, buf); out.push([x, y, ...Array.from(buf).map((v) => +v.toFixed(3))]); } return JSON.stringify(out); };
