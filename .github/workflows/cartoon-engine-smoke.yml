@@ -1,0 +1,70 @@
+name: Cartoon engine smoke test
+
+on:
+  push:
+    branches:
+      - "codex/**"
+  pull_request:
+    paths:
+      - "Kit/**"
+      - "SKILL.md"
+      - ".github/workflows/cartoon-engine-smoke.yml"
+
+jobs:
+  render-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project engine
+        run: |
+          bash Kit/tools/setup.sh "$RUNNER_TEMP/cartoon-short"
+          cd "$RUNNER_TEMP/cartoon-short"
+          npm install --no-audit --no-fund playwright
+          npx playwright install --with-deps chromium
+
+      - name: Check JavaScript syntax
+        run: |
+          node --check Kit/engine/Web/main.js
+          node --check Kit/engine/Web/story.js
+          node --check Kit/engine/Web/cast.js
+          node --check Kit/engine/Web/castdefs.js
+          node --check Kit/engine/Web/motion.js
+          node --check Kit/engine/Web/terrain.js
+          node --check Kit/engine/Web/paint.js
+          node --check Kit/engine/render.mjs
+
+      - name: Render character design sheet
+        working-directory: ${{ runner.temp }}/cartoon-short
+        run: node render.mjs page charsheet.html "$RUNNER_TEMP/character-sheet.png"
+
+      - name: Render environment design sheet
+        working-directory: ${{ runner.temp }}/cartoon-short
+        run: node render.mjs page worldsheet.html "$RUNNER_TEMP/world-sheet.png"
+
+      - name: Render representative story frames
+        working-directory: ${{ runner.temp }}/cartoon-short
+        run: node render.mjs "$RUNNER_TEMP/story-frames" "0,35,106,268,420,600,780,960,1136,1253"
+
+      - name: Upload visual smoke-test outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cartoon-engine-smoke-review
+          path: |
+            ${{ runner.temp }}/character-sheet.png
+            ${{ runner.temp }}/world-sheet.png
+            ${{ runner.temp }}/story-frames/
+          if-no-files-found: warn
