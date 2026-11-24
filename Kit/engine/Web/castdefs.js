@@ -41,7 +41,7 @@ export const VIL_30 = { sari:"#b85b68", border:"#e9cf83", top:"#537c78", skin:"#
 // Reserved, repeatable channel identity. Keep this outfit and seed stable between episodes.
 // Story-specific characters should never borrow this preset.
 export const CHANNEL_MASCOT = {
-  top:"#176f78", kurta:true, dhoti:"#f0dfb6", pagri:"#e4a83d",
+  top:"#176f78", kurta:true, dhoti:"#f0dfb6", pagri:"#e4a83d", gamchha:"#e4a83d",
   skin:"#b97850", hair:"#241a18", moustache:"#241a18", barefoot:true
 };
 export const CHANNEL_MASCOT_ID = "channel-mascot";
