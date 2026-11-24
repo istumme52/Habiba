@@ -89,6 +89,7 @@ Make one row per shot: frames, words, setting, light, camera move, characters/po
 ### 4.3 World (`web/main.js`)
 Keep the engine sections: toon materials, ink contract, `add`/`tbox`, sky, lights, cards, render targets/post, `applyLight`, `drawActors`, `swapForNd`, `renderFrame`. Replace the example world between `// ---------- world ----------` and `// ---------- cards ----------`, plus the story parts of `worldState()`.
 - Build from primitives with painted canvas textures (`paint.js`: planks, beams, rotten wood, stone, moss/ivy, grass, dirt, plaster, roof tiles, marble, banners, carved text). Write new painters in the same flat-with-dark-seams style.
+- Village houses should read as lived-in sets: layered roof edges, timber door frames, recessed shuttered windows, thresholds, porch details and yard fencing. Keep props grounded to the terrain and leave clear camera/character paths.
 - Use `tbox` for constant texel density, a 2-step toon gradient, and fog = horizon colour.
 - Background: hills (half-buried spheres), mountains (cones + snow caps), cypress/pine trees, distant houses, painted cloud billboards.
 - Set pieces (collapses, falls, doors) are pivoted groups driven by 0..1 progress from `worldAt(f)`, with eased and staggered parts.
@@ -97,6 +98,7 @@ Keep the engine sections: toon materials, ink contract, `add`/`tbox`, sky, light
 ### 4.4 Cast (`web/cast.js` + `web/castdefs.js` → `web/toon.js`)
 - `bodyFrontX(p, outfit, opts)` (and `bodySideX` for profiles) draws on a 600x1000 design canvas with soles at y=975. The card is 2.25 m tall, so 1 unit = 0.00225 m.
 - Outfits are plain objects in `castdefs.js` (fields such as top, kurta, short, dhoti, shorts, sari, border, pagri, hair, beard, beardSize, moustache, skin, barefoot, build). Add new ones there, and new garments, headgear and props to `cast.js` in the same style.
+- The kit includes 35 story-character outfit presets plus the reserved `CHANNEL_MASCOT` design and stable `CHANNEL_MASCOT_ID`. Keep the mascot's outfit and seed unchanged across episodes; do not reuse it as a story character. The character sheet previews all presets and includes profile/walk/hammer motion checks.
 - Arm poses: hang, spear, point, up, wave, hip, belly, temple (+swirl), lift, reach (+lift), cheek, shield, cross, thumb.
 - Expressions: the toon.ts FACE set plus snore, stubborn, squint. Extend FACE for more.
 - Rebuild after edits with `cat web/toonbase.js web/cast.js > web/toon.js`. Render a character test sheet before using new designs.
