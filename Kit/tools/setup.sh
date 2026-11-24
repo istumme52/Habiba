@@ -3,7 +3,10 @@
 set -e
 KIT="$(cd "$(dirname "$0")/.." && pwd)"; DST="${1:?usage: setup.sh ~/shorts/<slug>}"
 mkdir -p "$DST"/{web,work,stills,frames,out,audio}
-cp -n "$KIT"/engine/web/* "$DST/web/"; cp -n "$KIT"/engine/{render.mjs,timing.py,sheet.py,finish.sh} "$DST/"; cp -n "$KIT"/engine/audio/* "$DST/audio/"
+# Source directory in this repository is Web (capital W); output folder remains web (lowercase).
+cp -n "$KIT"/engine/Web/* "$DST/web/"
+cp -n "$KIT"/engine/{render.mjs,timing.py,sheet.py,finish.sh} "$DST/"
+cp -n "$KIT"/engine/audio/* "$DST/audio/"
 chmod +x "$DST/finish.sh"
 cd "$DST/web"
 [ -f package.json ] || printf '{ "name": "short", "private": true, "type": "module" }\n' > package.json
