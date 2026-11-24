@@ -32,7 +32,8 @@ if (outArg === "page") {
   await page.setViewportSize({ width: 2400, height: 2200 });
   await page.goto(`http://127.0.0.1:${port}/${spec}`);
   await page.waitForFunction("window.done === true", null, { timeout: 120000 });
-  await page.locator("canvas").first().screenshot({ path: extra });
+  if (await page.locator("#grid").count()) await page.screenshot({ path: extra, fullPage: true });
+  else await page.locator("canvas").first().screenshot({ path: extra });
   console.log("wrote", extra);
 } else {
   const parse = (s) => s.split(",").flatMap((t) => { const m = t.match(/^(\d+)-(\d+)$/); if (!m) return [Number(t)]; const a = []; for (let i = +m[1]; i <= +m[2]; i++) a.push(i); return a; });
