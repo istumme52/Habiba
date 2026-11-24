@@ -170,8 +170,61 @@ const house = (x, z, w, d, hgt, rot, kind = 0) => {
   void gable;
   const gab = new THREE.Mesh(new THREE.ExtrudeGeometry(new THREE.Shape([new THREE.Vector2(-d / 2, 0), new THREE.Vector2(d / 2, 0), new THREE.Vector2(0, rise * (d / 2) / (d / 2 + over) - 0.02)]), { depth: w - 0.02, bevelEnabled: false }), [MAT.mud, MAT.mud2, MAT.mudW][kind % 3]);
   gab.rotation.y = Math.PI / 2; gab.position.set(-w / 2 + 0.01, hgt, 0); g.add(gab);
-  const door = new THREE.Mesh(new THREE.BoxGeometry(0.95, 1.8, 0.08), MAT.door); door.position.set(w * 0.15, 0.95, d / 2 + 0.02); g.add(door);
-  const win = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.55, 0.08), MAT.dark); win.position.set(-w * 0.25, hgt * 0.62, d / 2 + 0.02); g.add(win);
+  const doorX = w * 0.15, front = d / 2 + 0.04;
+  const door = new THREE.Mesh(new THREE.BoxGeometry(0.95, 1.8, 0.08), MAT.door); door.position.set(doorX, 0.95, front); g.add(door);
+  // Carved timber doorway, raised stone-free mud threshold and a small shade hood.
+  const jambMat = MAT.trunk;
+  for (const side of [-1, 1]) {
+    const jamb = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.95, 0.14), jambMat);
+    jamb.position.set(doorX + side * 0.54, 0.98, front + 0.015); g.add(jamb);
+  }
+  const lintel = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.14, 0.16), jambMat);
+  lintel.position.set(doorX, 1.94, front + 0.015); g.add(lintel);
+  const step = new THREE.Mesh(new THREE.BoxGeometry(1.25, 0.16, 0.42), MAT.dirt);
+  step.position.set(doorX, 0.08, d / 2 + 0.22); g.add(step);
+  const hood = new THREE.Mesh(new THREE.BoxGeometry(1.55, 0.12, 0.72), kind % 2 ? MAT.thatch : MAT.tile);
+  hood.position.set(doorX, 2.15, d / 2 + 0.28); g.add(hood);
+  for (const side of [-1, 1]) {
+    const bracket = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.42, 0.1), jambMat);
+    bracket.position.set(doorX + side * 0.62, 1.92, d / 2 + 0.48); bracket.rotation.x = -0.45; g.add(bracket);
+  }
+  // Recessed window with a timber frame, two shutters and cross bars.
+  const winX = -w * 0.25, winY = hgt * 0.62, winZ = front + 0.01;
+  const win = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.55, 0.08), MAT.dark); win.position.set(winX, winY, winZ); g.add(win);
+  for (const side of [-1, 1]) {
+    const shutter = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.66, 0.1), MAT.door);
+    shutter.position.set(winX + side * 0.39, winY, winZ + 0.035); g.add(shutter);
+    const frame = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.72, 0.12), jambMat);
+    frame.position.set(winX + side * 0.35, winY, winZ + 0.07); g.add(frame);
+  }
+  for (const y of [-0.12, 0.12]) {
+    const bar = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.045, 0.1), jambMat);
+    bar.position.set(winX, winY + y, winZ + 0.09); g.add(bar);
+  }
+  const sill = new THREE.Mesh(new THREE.BoxGeometry(0.86, 0.1, 0.24), jambMat);
+  sill.position.set(winX, winY - 0.38, winZ + 0.08); g.add(sill);
+  // Exposed roof-edge beams give the thatch/tile roof a readable layered silhouette.
+  for (const side of [-1, 1]) {
+    const eave = new THREE.Mesh(new THREE.BoxGeometry(w + 0.95, 0.16, 0.16), jambMat);
+    eave.position.set(0, hgt + 0.06, side * (d / 2 + over * 0.75)); g.add(eave);
+  }
+  // Small front-yard fence with an opening aligned to the doorway.
+  const fenceZ = d / 2 + 3.1;
+  const addFenceRun = (x0, x1) => {
+    if (x1 - x0 < 0.35) return;
+    const count = Math.max(2, Math.ceil((x1 - x0) / 1.45));
+    for (let i = 0; i <= count; i++) {
+      const px = x0 + (x1 - x0) * i / count;
+      const post = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.82, 0.12), jambMat);
+      post.position.set(px, 0.41, fenceZ); g.add(post);
+    }
+    for (const yy of [0.28, 0.66]) {
+      const rail = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, 0.09, 0.09), jambMat);
+      rail.position.set((x0 + x1) / 2, yy, fenceZ); g.add(rail);
+    }
+  };
+  addFenceRun(-w / 2, doorX - 0.9);
+  addFenceRun(doorX + 0.9, w / 2);
   g.position.set(x, y0, z); g.rotation.y = rot;
   g.traverse((o) => { if (o.isMesh) { o.castShadow = o.receiveShadow = true; world.push(o); } });
   scene.add(g);
