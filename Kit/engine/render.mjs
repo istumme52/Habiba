@@ -31,7 +31,7 @@ page.on("pageerror", (e) => console.error("[pageerror]", e.message));
 if (outArg === "page") {
   await page.setViewportSize({ width: 2400, height: 2200 });
   try {
-    await page.goto(`http://127.0.0.1:${port}/${spec}`);
+    await page.goto(`http://127.0.0.1:${port}/${spec}`, { waitUntil: "domcontentloaded", timeout: 120000 });
     await page.waitForFunction("window.done === true", null, { timeout: 120000 });
     if (await page.locator("#grid").count()) await page.screenshot({ path: extra, fullPage: true });
     else await page.locator("canvas").first().screenshot({ path: extra });
