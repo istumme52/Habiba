@@ -51,6 +51,8 @@ jobs:
           node --check Kit/engine/Web/terrain.js
           node --check Kit/engine/Web/paint.js
           node --check Kit/engine/render.mjs
+          node --check Kit/engine/ai/plan_story.mjs
+          node Kit/engine/ai/plan_story.mjs --self-test
           python -m py_compile Kit/engine/timing.py Kit/engine/audio/*.py
 
       - name: Render character design sheet
