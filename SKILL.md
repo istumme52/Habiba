@@ -59,13 +59,13 @@ Keep the final script text. It drives the timing in Stage 4, so no speech recogn
 Do everything from here without stopping. Ask only if the timing cannot be resolved.
 
 ### 4.0 Get the kit
-The code kit ships **inside this skill folder** at `kit/` (engine, tools, the Mountain Man worked example, and `engine/web/toonbase.js`, the `toon.ts` Pen library from github.com/mromidev/claude-animated-shorts with its types already stripped, MIT). Locate the folder with `find / -name SKILL.md -path "*cartoon-audio-short*" 2>/dev/null` and treat its `kit/` as read-only.
+The code kit ships **inside this skill folder** at `Kit/` (engine, tools, the Mountain Man worked example, and `Kit/engine/Web/toonbase.js`, the `toon.ts` Pen library from github.com/mromidev/claude-animated-shorts with its types already stripped, MIT). Locate the folder with `find / -name SKILL.md -path "*cartoon-audio-short*" 2>/dev/null` and treat its `Kit/` as read-only.
 
-Then run `bash <skill>/kit/tools/setup.sh ~/shorts/<slug>`. It copies the engine and tools into the project, installs three.js r160 with npm, builds `web/toon.js` (`toonbase.js` + `cast.js`), and links the global Playwright. Only the three.js install needs the network.
+Then run `bash <skill>/Kit/tools/setup.sh ~/shorts/<slug>`. It copies the engine and tools into the project, installs three.js r160 with npm, builds `web/toon.js` (`toonbase.js` + `cast.js`), and links the global Playwright. Only the three.js install needs the network.
 - Requirements: Node 22.6+, Python 3 with numpy + Pillow, ffmpeg, and Playwright with Chromium (`npm i -g playwright && npx playwright install chromium` if missing).
 - If package registries are blocked, git over GitHub usually works. Never disable TLS or route around the proxy.
 - Chromium: use the pre-installed Playwright browser with `--use-angle=swiftshader --enable-unsafe-swiftshader --ignore-gpu-blocklist`. That gives CPU WebGL at about 3-10 s per frame (≈3.5 s on 2 cores, so a 42 s short is ~75 min of rendering).
-- **If `kit/` is missing** (a synced copy of the skill can carry only this SKILL.md), tell the user in one line and rebuild it: `git clone --depth 1 https://github.com/mromidev/claude-animated-shorts` for `templates/bridge/toon.ts` (strip types with `module.stripTypeScriptTypes` → `toonbase.js`) and `templates/audio/{dsp,instruments,sfx_gen}.py`, `npm i three@0.160.0`, then write the engine files listed under Architecture, keeping every Engine gotcha. Keep the rebuilt kit and offer it to the user as a zip so it can go back into the skill folder.
+- **If `Kit/` is missing** (a synced copy of the skill can carry only this SKILL.md), tell the user in one line and rebuild it: `git clone --depth 1 https://github.com/mromidev/claude-animated-shorts` for `templates/bridge/toon.ts` (strip types with `module.stripTypeScriptTypes` → `toonbase.js`) and `templates/audio/{dsp,instruments,sfx_gen}.py`, `npm i three@0.160.0`, then write the engine files listed under Architecture, keeping every Engine gotcha. Keep the rebuilt kit and offer it to the user as a zip so it can go back into the skill folder.
 
 ### 4.1 Timing
 Run `python3 timing.py voice.mp3 script.txt --out work`.
@@ -89,6 +89,7 @@ Make one row per shot: frames, words, setting, light, camera move, characters/po
 ### 4.3 World (`web/main.js`)
 Keep the engine sections: toon materials, ink contract, `add`/`tbox`, sky, lights, cards, render targets/post, `applyLight`, `drawActors`, `swapForNd`, `renderFrame`. Replace the example world between `// ---------- world ----------` and `// ---------- cards ----------`, plus the story parts of `worldState()`.
 - Build from primitives with painted canvas textures (`paint.js`: planks, beams, rotten wood, stone, moss/ivy, grass, dirt, plaster, roof tiles, marble, banners, carved text). Write new painters in the same flat-with-dark-seams style.
+- Village houses should read as lived-in sets: layered roof edges, timber door frames, recessed shuttered windows, thresholds, porch details and yard fencing. Keep props grounded to the terrain and leave clear camera/character paths.
 - Use `tbox` for constant texel density, a 2-step toon gradient, and fog = horizon colour.
 - Background: hills (half-buried spheres), mountains (cones + snow caps), cypress/pine trees, distant houses, painted cloud billboards.
 - Set pieces (collapses, falls, doors) are pivoted groups driven by 0..1 progress from `worldAt(f)`, with eased and staggered parts.
@@ -97,6 +98,7 @@ Keep the engine sections: toon materials, ink contract, `add`/`tbox`, sky, light
 ### 4.4 Cast (`web/cast.js` + `web/castdefs.js` → `web/toon.js`)
 - `bodyFrontX(p, outfit, opts)` (and `bodySideX` for profiles) draws on a 600x1000 design canvas with soles at y=975. The card is 2.25 m tall, so 1 unit = 0.00225 m.
 - Outfits are plain objects in `castdefs.js` (fields such as top, kurta, short, dhoti, shorts, sari, border, pagri, hair, beard, beardSize, moustache, skin, barefoot, build). Add new ones there, and new garments, headgear and props to `cast.js` in the same style.
+- The kit includes 35 story-character outfit presets plus the reserved `CHANNEL_MASCOT` design and stable `CHANNEL_MASCOT_ID`. Keep the mascot's outfit and seed unchanged across episodes; do not reuse it as a story character. The character sheet previews all presets and includes profile/walk/hammer motion checks.
 - Arm poses: hang, spear, point, up, wave, hip, belly, temple (+swirl), lift, reach (+lift), cheek, shield, cross, thumb.
 - Expressions: the toon.ts FACE set plus snore, stubborn, squint. Extend FACE for more.
 - Rebuild after edits with `cat web/toonbase.js web/cast.js > web/toon.js`. Render a character test sheet before using new designs.
