@@ -23,18 +23,32 @@ console.log(m.total_frames, m.fps, m.duration_seconds);
 NODE
 )
 VOICE_SECONDS="$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$VOICE")"
-python3 - "$VOICE_SECONDS" "$DURATION" <<'PY'
+VOICE_FOR_MIX="$VOICE"
+TEMPO="$(python3 - "$VOICE_SECONDS" "$DURATION" <<'PY'
 import sys
 actual, expected = map(float, sys.argv[1:])
-if abs(actual - expected) > 0.35:
-    raise SystemExit(f"ERROR: narration is {actual:.2f}s but storyboard is {expected:.2f}s; adjust narration before rendering.")
-print(f"Narration duration OK: {actual:.2f}s")
+delta = abs(actual - expected)
+if delta <= 0.35:
+    print("1.0")
+else:
+    tempo = actual / expected
+    if not 0.80 <= tempo <= 1.25:
+        raise SystemExit(f"ERROR: narration is {actual:.2f}s vs storyboard {expected:.2f}s. Auto timing supports only 0.80x–1.25x; regenerate or edit the voiceover.")
+    print(f"{tempo:.6f}")
 PY
-echo "[1/2] Rendering $TOTAL frames at $FPS fps"
+)"
+if [[ "$TEMPO" != "1.0" ]]; then
+  echo "Adjusting voiceover speed to fit storyboard (${TEMPO}x; pitch-preserving)"
+  ffmpeg -y -v error -i "$VOICE" -filter:a "atempo=$TEMPO" -ar 48000 -ac 2 out/voice-aligned.wav
+  VOICE_FOR_MIX="out/voice-aligned.wav"
+else
+  echo "Narration duration OK: ${VOICE_SECONDS}s"
+fi
+echo "[1/3] Rendering $TOTAL frames at $FPS fps"
 node render.mjs manifest "$MANIFEST" frames "0-$((TOTAL - 1))"
 echo "[2/3] Generating scene-based original music and sound effects"
 python3 audio/story_audio.py "$MANIFEST" out
-python3 audio/mix.py "$VOICE" out/music.wav out/sfx.wav out/voice-music-sfx.wav
+python3 audio/mix.py "$VOICE_FOR_MIX" out/music.wav out/sfx.wav out/voice-music-sfx.wav
 python3 audio/finish_audio.py out/voice-music-sfx.wav out/final-audio.wav
 echo "[3/3] Encoding MP4 with narration, music and sound effects"
 ffmpeg -y -v warning -framerate "$FPS" -i "frames/f%04d.jpg" -i out/final-audio.wav -map 0:v:0 -map 1:a:0 -c:v libx264 -preset medium -crf 19 -pix_fmt yuv420p -c:a aac -b:a 192k -t "$DURATION" -movflags +faststart "out/$TITLE.mp4"
