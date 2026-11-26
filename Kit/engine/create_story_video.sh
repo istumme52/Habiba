@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# End-to-end AI story -> storyboard -> narration -> rendered vertical MP4.
+# Usage: ./create_story_video.sh "Story idea" 60 Bangla episode_title
+set -Eeuo pipefail
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+cd "$ROOT"
+PROMPT="${1:?Usage: ./create_story_video.sh \"Story idea\" duration_seconds language title}"
+DURATION="${2:?Missing duration_seconds (15-600)}"
+LANGUAGE="${3:?Missing language, e.g. Bangla or English}"
+TITLE="${4:-episode}"
+[[ "$DURATION" =~ ^[0-9]+$ ]] && (( DURATION >= 15 && DURATION <= 600 )) || { echo "ERROR: duration must be 15-600 whole seconds." >&2; exit 2; }
+[[ "$TITLE" =~ ^[A-Za-z0-9._-]+$ ]] || { echo "ERROR: title may contain only letters, numbers, dot, underscore and hyphen." >&2; exit 2; }
+: "${AI_API_KEY:?Set AI_API_KEY in the environment}"
+: "${AI_MODEL:?Set AI_MODEL in the environment}"
+: "${TTS_MODEL:?Set TTS_MODEL in the environment}"
+: "${TTS_VOICE:?Set TTS_VOICE in the environment}"
+if [[ -z "${TTS_API_KEY:-}" && -z "${AI_API_KEY:-}" ]]; then
+  echo "ERROR: set TTS_API_KEY or AI_API_KEY." >&2; exit 2
+fi
+for cmd in node python3 ffmpeg ffprobe; do command -v "$cmd" >/dev/null || { echo "ERROR: missing dependency: $cmd" >&2; exit 3; }; done
+mkdir -p out
+echo "[1/4] Planning story"
+node ai/plan_story.mjs --prompt "$PROMPT" --duration "$DURATION" --language "$LANGUAGE" --output out/storyboard.json
+echo "[2/4] Creating scene frame manifest"
+node ai/storyboard_to_manifest.mjs --input out/storyboard.json --output out/render-manifest.json
+echo "[3/4] Generating narration"
+node ai/generate_voice.mjs --input out/storyboard.json --output out/narration.mp3 --transcript out/narration.txt
+echo "[4/4] Rendering and mixing MP4"
+./build_storyboard_video.sh out/render-manifest.json out/narration.mp3 "$TITLE"
+echo "ALL DONE: out/$TITLE.mp4"
