@@ -53,6 +53,8 @@ jobs:
           node --check Kit/engine/render.mjs
           node --check Kit/engine/ai/plan_story.mjs
           node Kit/engine/ai/plan_story.mjs --self-test
+          node --check Kit/engine/ai/generate_voice.mjs
+          node Kit/engine/ai/generate_voice.mjs --self-test
           python -m py_compile Kit/engine/timing.py Kit/engine/audio/*.py
 
       - name: Render character design sheet
