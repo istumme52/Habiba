@@ -5,6 +5,7 @@ A 9:16 cartoon/3D story-video rendering kit with a worked 41.8-second example an
 ## What is included
 - `tools/setup.sh ~/shorts/<slug>`: copies the engine, AI planner and dependencies into a project, installs Three.js r160 and builds `web/toon.js`.
 - `engine/ai/plan_story.mjs`: creates a structured storyboard JSON file from a story idea using an OpenAI-compatible Chat Completions endpoint. It validates character references, scene fields and exact duration.
+- `engine/ai/generate_voice.mjs`: converts the storyboard narration/dialogue into an MP3 using an OpenAI-compatible speech endpoint; saves a transcript too.
 - `engine/Web/` (source folder; capital W): Three.js toon world, fixed example timeline, terrain, motion, character presets (35 story outfits plus a reserved channel mascot), and visual review sheets.
 - `engine/render.mjs`: Playwright frame/still/test-page renderer.
 - `engine/timing.py` and `engine/audio/`: narration timing, original procedural music/SFX, mixing and final loudness processing.
