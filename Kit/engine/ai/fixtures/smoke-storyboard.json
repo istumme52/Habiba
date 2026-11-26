@@ -1,0 +1,14 @@
+{
+  "title": "Renderer export smoke test",
+  "logline": "A traveler notices a strange light.",
+  "language": "English",
+  "aspect_ratio": "9:16",
+  "fps": 30,
+  "duration_seconds": 1,
+  "characters": [
+    { "id": "traveler", "name": "Traveler", "description": "A curious young traveler", "outfit": "Teal jacket and dark trousers" }
+  ],
+  "scenes": [
+    { "scene_number": 1, "duration_seconds": 1, "location": "Village lane", "time_of_day": "Morning", "background": "A quiet village lane", "character_ids": ["traveler"], "action": "Walks slowly into the lane", "camera_shot": "Wide shot", "camera_movement": "Tracking", "narration": "A light appeared.", "dialogue": [], "sound_effects": ["Footsteps"], "music_mood": "Curious", "transition": "Cut" }
+  ]
+}
