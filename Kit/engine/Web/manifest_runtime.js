@@ -7,9 +7,8 @@ const hash = (s) => { let h = 2166136261; for (const c of String(s)) { h ^= c.ch
 const palette = (seed) => {
   const h = hash(seed);
   const tops = ["#3f6fb5","#4f8b78","#a64f58","#b5653f","#76569a","#63824b","#3e7770","#b27b3f"];
-  const bottoms = ["#eee6d5","#d6c6a9","#e7ddc9","#e4d7bd"];
-  const skins = ["#b97d52","#c58c5e","#a86d44","#d09a70","#936044"];
-  return { top: tops[h % tops.length], kurta: true, dhoti: bottoms[(h >>> 5) % bottoms.length], skin: skins[(h >>> 9) % skins.length], hair: "#241a18", moustache: "#241a18", barefoot: true };
+    const skins = ["#b97d52","#c58c5e","#a86d44","#d09a70","#936044"];
+  return { top: tops[h % tops.length], pants: ["#29384d","#46515d","#343b48","#6a6258"][(h >>> 5) % 4], skin: skins[(h >>> 9) % skins.length], hair: "#241a18", boots: "#34343a", sleeve: true };
 };
 const lightFor = (time) => {
   const t = String(time || "").toLowerCase();
