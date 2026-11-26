@@ -140,19 +140,20 @@ export const bodyFrontX = (p, o, opts) => {
     // pleats
     for (const dx of [-6, 0, 6]) p.stroke([[300 + dx * u, hipY + 0.2 * HH], [300 + dx * 1.6 * u, sole - 0.12 * HH]], 1.6 * u, mul(o.sari, [0.7, 0.7, 0.75]));
   } else {
-    const hem = hipY + (o.shorts ? 0.3 : 0.7) * (sole - hipY);
+    const hem = hipY + (o.shorts ? 0.3 : o.pants ? 0.94 : 0.7) * (sole - hipY);
     for (const side of [-1, 1]) {
       const fx = 300 + side * 20 * u, fy = sole - 4 * u;
       p.stroke([[300 + side * 15 * u, hem - 10 * u], [fx, fy]], 5.6 * u, skinLeg);
       foot(fx, fy + 3 * u, side);
     }
-    const lowCol = o.dhoti || o.shorts;
+    const lowCol = o.dhoti || o.shorts || o.pants;
     if (lowCol) {
       const pts = [[300 - 34 * u, hipY - 0.05 * HH], [300 + 34 * u, hipY - 0.05 * HH], [300 + 44 * u, hem], [300 + 10 * u, hem + 6 * u], [300, hem - 14 * u], [300 - 10 * u, hem + 6 * u], [300 - 44 * u, hem]];
       p.gradFill(pts, lowCol, mul(lowCol, SH_CLOTH), light);
       p.poly(pts, null, ow * 0.85);
       p.stroke([[300 + 4 * u, hipY + 0.05 * HH], [300 + 2 * u, hem - 16 * u]], 1.8 * u, mul(lowCol, [0.7, 0.7, 0.75]));
       if (o.dhoti) p.stroke([[300 - 22 * u, hipY + 0.2 * HH], [300 - 28 * u, hem - 4 * u]], 1.4 * u, mul(lowCol, [0.75, 0.75, 0.8]));
+      else if (o.pants) p.stroke([[300 - 20 * u, hipY + 0.25 * HH], [300 - 23 * u, hem - 4 * u]], 1.4 * u, mul(lowCol, [0.72, 0.72, 0.78]));
     }
   }
   // ---- upper body ----
@@ -271,7 +272,7 @@ export const bodySideX = (p, o, opts) => {
   const footS = (L, near) => {
     const c = Math.cos(L.pitch), s = Math.sin(L.pitch);
     const a = [L.ank[0] - 3 * u * c, L.ank[1] - 3 * u * s], b = [L.ank[0] + 13 * u * c, L.ank[1] + 13 * u * s + 0.5 * u];
-    p.stroke([a, b], 7.5 * u + 3, INK); p.stroke([a, b], 7.5 * u, near ? skin : skinFar);
+    p.stroke([a, b], 7.5 * u + 3, INK); p.stroke([a, b], 7.5 * u, o.boots || (near ? skin : skinFar));
   };
   if (o.sari && !o.dhoti) {
     legs.forEach((L) => footS(L, L.near));
@@ -286,6 +287,7 @@ export const bodySideX = (p, o, opts) => {
       const kn = knees[i], hp0 = [300 + (L.near ? 0 : -5 * u), hipY];
       p.stroke([kn, L.ank], 5.4 * u, L.near ? skinLeg : skinFar);
       if (o.dhoti) p.line([hp0, kn, lerp2(kn, L.ank, 0.18)], L.near ? o.dhoti : mul(o.dhoti, [0.8, 0.8, 0.86]), 13 * u);
+      else if (o.pants) p.line([hp0, kn, L.ank], L.near ? o.pants : mix(o.pants, INK, 0.18), 13 * u);
       else p.stroke([hp0, kn], 5.8 * u, mix(o.pants || "#555", INK, 0.5));
       footS(L, L.near);
     });
