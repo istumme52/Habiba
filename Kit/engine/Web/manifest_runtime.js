@@ -1,5 +1,4 @@
-// Runtime adapter: maps a validated storyboard manifest onto the existing toon renderer.
-// The current 3D set is the bundled village/mountain world; arbitrary background asset generation is not implied.
+// Runtime adapter: maps a validated storyboard manifest onto the toon renderer and its reusable low-poly scene props.
 const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
 const smooth = (t) => t * t * (3 - 2 * t);
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -50,10 +49,20 @@ export function manifestFrameState(frame, manifest) {
     return { id: "manifest-" + id, kind, outfit, outfitKey: character.id, pos:[x + Math.sin(local * Math.PI) * (moving ? 1.1 : 0), 14 + (i % 2) * 0.8], dir:[0, moving ? -1 : 1], opts, scale: ids.length > 2 ? 0.82 : 1, pull:0.45 };
   });
   const cam = cameraFor(scene.camera?.shot || scene.camera_shot, scene.camera?.movement || scene.camera_movement, local);
+  const description = [scene.location, scene.background, scene.action, scene.title].filter(Boolean).join(" ").toLowerCase();
+  const props = new Set();
+  if (/forest|jungle|park|mountain|hill|nature|village|outdoor|field|river|lake|camp|road|street|garden|tree/.test(description)) { props.add("tree"); props.add("bird"); }
+  if (/village|town|house|home|street|neighbourhood/.test(description)) props.add("house");
+  if (/city|urban|street|road|traffic|car|vehicle|market/.test(description)) { props.add("road"); props.add("car"); props.add("lamp"); }
+  if (/bicycle|cycle|cycling/.test(description)) props.add("bicycle");
+  if (/hospital|clinic|school|station|building/.test(description)) props.add("house");
+  if (/road|street|walkway|sidewalk/.test(description)) { props.add("road"); props.add("lamp"); }
+  if (!props.size) { props.add("tree"); props.add("bird"); }
   return {
     shot: "manifest-scene-" + scene.scene_number,
     cam, light: lightFor(scene.time_of_day), actors, fx: [],
     world: { progress: 0.28, slab:null, plug:null, short:false },
+    props: [...props],
     flash: /flash|white/.test(String(scene.transition || "").toLowerCase()) && local < 0.06 ? 0.25 : 0,
     vign: 0.18,
     dof: { focus: 24, cInf: /close|detail/i.test(scene.camera?.shot || scene.camera_shot || "") ? 5 : 10 },
