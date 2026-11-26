@@ -1,0 +1,16 @@
+{
+  "title": "A small mystery",
+  "logline": "A traveler notices a strange light in a quiet village.",
+  "language": "English",
+  "aspect_ratio": "9:16",
+  "fps": 30,
+  "duration_seconds": 3,
+  "characters": [
+    { "id": "traveler", "name": "Traveler", "description": "A curious young traveler", "outfit": "Teal jacket and cream trousers", "voice_style": "Curious and warm" }
+  ],
+  "scenes": [
+    { "scene_number": 1, "duration_seconds": 1, "location": "Village lane", "time_of_day": "Morning", "background": "A village lane with trees", "character_ids": ["traveler"], "action": "Walks slowly into the lane", "camera_shot": "Wide shot", "camera_movement": "Tracking", "narration": "It began with a light.", "dialogue": [], "sound_effects": ["Footsteps"], "music_mood": "Curious", "transition": "Cut" },
+    { "scene_number": 2, "duration_seconds": 1, "location": "Village lane", "time_of_day": "Evening", "background": "The same lane under a golden sky", "character_ids": ["traveler"], "action": "Points toward the strange light", "camera_shot": "Medium shot", "camera_movement": "Slow push-in", "narration": "Then the light moved.", "dialogue": [], "sound_effects": ["Soft whoosh"], "music_mood": "Mysterious", "transition": "Cut" },
+    { "scene_number": 3, "duration_seconds": 1, "location": "Village lane", "time_of_day": "Night", "background": "The lane becomes quiet and dark", "character_ids": ["traveler"], "action": "Looks around in surprise", "camera_shot": "Close-up", "camera_movement": "Static", "narration": "And nobody knew why.", "dialogue": [], "sound_effects": ["Night insects"], "music_mood": "Suspense", "transition": "Fade" }
+  ]
+}
