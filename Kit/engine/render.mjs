@@ -35,8 +35,8 @@ if (outArg === "manifest") {
     throw new Error("Invalid render manifest");
   }
   const dataFile = path.join(ROOT, "storyboard-data.js");
-  fs.writeFileSync(dataFile, "window.STORYBOARD_MANIFEST = " + JSON.stringify(manifest) + ";\\n", "utf8");
-  const parse = (s) => s.split(",").flatMap((t) => { const m = t.match(/^(\\d+)-(\\d+)$/); if (!m) return [Number(t)]; const a = []; for (let i = +m[1]; i <= +m[2]; i++) a.push(i); return a; });
+  fs.writeFileSync(dataFile, "window.STORYBOARD_MANIFEST = " + JSON.stringify(manifest) + ";\n", "utf8");
+  const parse = (s) => s.split(",").flatMap((t) => { const m = t.match(/^(\d+)-(\d+)$/); if (!m) return [Number(t)]; const a = []; for (let i = +m[1]; i <= +m[2]; i++) a.push(i); return a; });
   const frames = parse(frameArg || `0-${manifest.total_frames - 1}`);
   if (frames.some((f) => !Number.isInteger(f) || f < 0 || f >= manifest.total_frames)) throw new Error("Frame index outside manifest duration");
   fs.mkdirSync(extra, { recursive: true });
