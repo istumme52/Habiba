@@ -52,7 +52,7 @@ python3 -m pip install -r requirements.txt
 ./build_storyboard_video.sh out/render-manifest.json out/narration.mp3 episode
 ```
 
-The script renders all frames at 1080×1920 / 30 fps, generates procedural music and cue-based sound effects, mixes them with the voiceover, applies final loudness processing, and writes `out/episode.mp4`. Narration duration must match the storyboard within 0.35 seconds.
+The script renders all frames at 1080×1920 / 30 fps, generates procedural music and cue-based sound effects, mixes them with the voiceover, applies final loudness processing, and writes `out/episode.mp4`. Narration is automatically time-stretched with pitch preservation when the difference is small (0.80×–1.25×); larger mismatches require regenerating or editing the voiceover.
 
 ## Offline tests
 
