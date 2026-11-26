@@ -46,6 +46,7 @@ jobs:
           bash -n Kit/tools/setup.sh
           bash -n Kit/engine/build_video.sh
           bash -n Kit/engine/build_storyboard_video.sh
+          bash -n Kit/engine/create_story_video.sh
           bash -n Kit/engine/finish.sh
           node --check Kit/engine/Web/main.js
           node --check Kit/engine/Web/story.js
