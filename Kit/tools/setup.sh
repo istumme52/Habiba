@@ -7,7 +7,7 @@ mkdir -p "$DST"/{web,work,stills,frames,out,audio,ai}
 cp -n "$KIT"/engine/Web/* "$DST/web/"
 cp -n "$KIT"/engine/{render.mjs,timing.py,sheet.py,finish.sh,build_video.sh,build_storyboard_video.sh,requirements.txt} "$DST/"
 cp -n "$KIT"/engine/audio/* "$DST/audio/"
-cp -n "$KIT"/engine/ai/* "$DST/ai/"
+cp -Rn "$KIT"/engine/ai/. "$DST/ai/"
 chmod +x "$DST/finish.sh" "$DST/build_video.sh" "$DST/build_storyboard_video.sh"
 cd "$DST/web"
 [ -f package.json ] || printf '{ "name": "short", "private": true, "type": "module" }\n' > package.json
