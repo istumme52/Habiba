@@ -38,7 +38,7 @@ python3 -m pip install -r requirements.txt
 ./build_storyboard_video.sh out/render-manifest.json out/narration.mp3 episode
 ```
 
-The output is `out/episode.mp4` (1080×1920, 30 fps). Scene mood and sound-effect cues generate simple original procedural music/SFX; the script mixes these with narration and applies final loudness processing. Voice duration must match the storyboard within 0.35 seconds.
+The output is `out/episode.mp4` (1080×1920, 30 fps). Scene mood and sound-effect cues generate simple original procedural music/SFX; the script mixes these with narration and applies final loudness processing. Voice duration is automatically pitch-preserved to fit within 0.80×–1.25×; larger mismatches need a re-record or edit.
 
 ## Existing example
 
