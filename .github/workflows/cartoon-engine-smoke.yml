@@ -80,4 +80,5 @@ jobs:
             ${{ runner.temp }}/character-sheet.png
             ${{ runner.temp }}/world-sheet.png
             ${{ runner.temp }}/story-frames/
+            ${{ runner.temp }}/manifest-frames/
           if-no-files-found: warn
