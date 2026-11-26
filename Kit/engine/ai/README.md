@@ -13,6 +13,16 @@ The workflow turns a story idea into a vertical short video:
 - An AI Chat Completions API key/model for planning and a compatible speech API key/model/voice for TTS.
 - Store credentials only in environment variables or GitHub Secrets. Never commit keys or paste them into chat.
 
+## One-command workflow
+
+After setting `AI_API_KEY`, `AI_MODEL`, `TTS_MODEL`, and `TTS_VOICE` (and optionally a separate `TTS_API_KEY`), you can run the complete pipeline from the generated project folder:
+
+```bash
+./create_story_video.sh "একটি রহস্যময় নদীর গল্প" 60 Bangla river_mystery
+```
+
+The script plans the story, creates the frame manifest, generates narration, renders scene frames, creates procedural music/SFX, mixes the audio and exports the MP4. For manual review, use the individual stages below.
+
 ## Generate a storyboard
 
 Set `AI_API_KEY` and `AI_MODEL`. Optionally set `AI_API_URL` for another compatible Chat Completions endpoint.
