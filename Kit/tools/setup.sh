@@ -10,7 +10,7 @@ cp -n "$KIT"/engine/audio/* "$DST/audio/"
 cp -n "$KIT"/engine/ai/* "$DST/ai/"
 chmod +x "$DST/finish.sh" "$DST/build_video.sh"
 cd "$DST/web"
-[ -f package.json ] || printf '{ "name": "short", "private": true, "type": "module" }\n' > package.json
+[ -f package.json ] || printf '{ "name": "short", "private": true, "type": "module" }\\n' > package.json
 [ -d node_modules/three ] || npm i three@0.160.0 --no-audit --no-fund >/dev/null
 cat toonbase.js cast.js > toon.js
 cd "$DST"
@@ -19,5 +19,7 @@ echo "ready: $DST"
 echo "Python audio dependencies: python3 -m pip install -r requirements.txt"
 echo "Playwright if needed: npm install --no-audit --no-fund playwright && npx playwright install chromium"
 echo "AI storyboard: set AI_API_KEY and AI_MODEL, then run node ai/plan_story.mjs --prompt 'Your story' --duration 60 --language English"
+echo "Storyboard timing manifest: node ai/storyboard_to_manifest.mjs --input out/storyboard.json --output out/render-manifest.json"
+echo "AI voiceover: set TTS_API_KEY, TTS_MODEL and TTS_VOICE, then run node ai/generate_voice.mjs"
 echo "Build included sample: ./build_video.sh voice.mp3 script.txt episode"
 echo "NOTE: the included story.js is a fixed 41.8-second example; the voice must match that duration."
