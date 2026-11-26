@@ -5,7 +5,7 @@ import path from "node:path";
 const [input, output = "web/storyboard-data.js"] = process.argv.slice(2);
 if (!input) throw new Error("Usage: node ai/prepare_storyboard.mjs <render-manifest.json> [web/storyboard-data.js]");
 const manifest = JSON.parse(await fs.readFile(path.resolve(input), "utf8"));
-if (manifest.manifest_version !== 1 || manifest.status !== "planning_only_not_renderable" ||
+if (manifest.manifest_version !== 1 || manifest.status !== "ready_for_bundled_renderer" ||
     manifest.fps !== 30 || manifest.aspect_ratio !== "9:16" ||
     !Number.isInteger(manifest.total_frames) || manifest.total_frames < 1 ||
     !Array.isArray(manifest.scenes) || !manifest.scenes.length) {
