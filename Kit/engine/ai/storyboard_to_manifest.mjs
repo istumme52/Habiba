@@ -64,7 +64,7 @@ export function createManifest(storyboard) {
   }
   return {
     manifest_version: 1,
-    status: "planning_only_not_renderable",
+    status: "ready_for_bundled_renderer",
     title: storyboard.title || "Untitled story",
     logline: storyboard.logline || "",
     language: storyboard.language || "",
@@ -75,9 +75,9 @@ export function createManifest(storyboard) {
     characters: storyboard.characters,
     scenes,
     renderer_notes: [
-      "This manifest preserves storyboard timing and creative direction.",
-      "Character/environment asset generation and arbitrary-scene 3D rendering are not implemented.",
-      "Do not pass this manifest to render.mjs as if it were an executable scene timeline."
+      "This manifest is executable by the bundled storyboard renderer.",
+      "The current renderer uses the bundled village/mountain world and stylized character cards.",
+      "Custom AI-generated locations, detailed props, full 3D character rigs and lip-sync are not included."
     ]
   };
 }
@@ -111,7 +111,7 @@ async function main() {
   await fs.writeFile(output, JSON.stringify(manifest, null, 2) + "\n", "utf8");
   console.log("Render manifest saved: " + output);
   console.log("Scenes: " + manifest.scenes.length + " | Frames: " + manifest.total_frames + " | Duration: " + manifest.duration_seconds + "s");
-  console.log("Status: planning manifest only; arbitrary 3D scene rendering is not yet supported.");
+  console.log("Status: ready for the bundled renderer; custom 3D asset generation is not included.");
 }
 
 main().catch((error) => {
