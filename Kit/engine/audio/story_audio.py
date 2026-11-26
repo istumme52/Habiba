@@ -52,7 +52,7 @@ def noise_burst(dur, amp=0.1, low=500, high=5000, seed=1):
 def cue_sound(label, seed):
     name = str(label).lower()
     if any(k in name for k in ("foot","step","walk","run")):
-        x = tone(82, 0.22, 0.28, 0.055) + noise_burst(0.16, 0.12, seed=seed)
+        x = tone(82, 0.22, 0.28, 0.055) + noise_burst(0.22, 0.12, seed=seed)
         return pan_mono(x, -0.12 if seed % 2 else 0.12)
     if any(k in name for k in ("wind","breeze","whoosh","swoosh")):
         x = noise_burst(1.1, 0.22, seed=seed)
@@ -67,7 +67,7 @@ def cue_sound(label, seed):
     if any(k in name for k in ("water","splash","river","rain")):
         return pan_mono(noise_burst(0.9, 0.16, seed=seed), -0.1)
     if any(k in name for k in ("impact","hit","crash","bang","thunder","explosion")):
-        x = tone(58, 0.8, 0.55, 0.19) + noise_burst(0.25, 0.3, seed=seed)
+        x = tone(58, 0.8, 0.55, 0.19) + noise_burst(0.8, 0.3, seed=seed)
         return pan_mono(x, 0)
     if any(k in name for k in ("insect","cricket","night")):
         t = np.arange(int(1.1*SR))/SR
