@@ -5,6 +5,7 @@ import * as P from "./paint.js";
 import { ridgeH, terrainH, groundAt, chanEnd, W0, CH, fbm } from "./terrain.js";
 import { frameState, TOTAL, VILLAGE, ROAD, LANE, CLINIC, SHORT } from "./story.js";
 import { CHANNEL_MASCOT } from "./castdefs.js";
+import { createSceneProps } from "./scene_props.js";
 
 const W = 1080, H = 1920, PX = W / 1080;
 const NOINK = 1;
@@ -29,6 +30,7 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 
 const scene = new THREE.Scene();
+const updateSceneProps = createSceneProps(scene);
 const camera = new THREE.PerspectiveCamera(40, W / H, 0.1, 3000);
 camera.layers.enableAll();
 scene.fog = new THREE.Fog(0xb8d0ec, 80, 900);
@@ -528,6 +530,7 @@ const camRightOf = () => { const r = new THREE.Vector3(); camera.matrixWorld.ext
 
 window.renderFrame = (f) => {
   const S = frameState(f);
+  updateSceneProps(S.props || []);
   setProgress(S.world.progress);
   shortRoad.visible = !!S.world.short;
   for (const [r, v] of [[routeLong, S.world.routeLong], [routeShort, S.world.routeShort]]) {
