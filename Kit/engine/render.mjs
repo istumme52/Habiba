@@ -1,6 +1,7 @@
 // Playwright frame renderer.
 //   node render.mjs frames "0-1253"        -> frames/f0000.jpg ...  (RESUME=1 skips existing files)
 //   node render.mjs stills/a "5,40,90"     -> stills/a/f0005.jpg ...
+//   node render.mjs manifest manifest.json frames [0,30,89] -> render storyboard-selected frames
 //   node render.mjs page charsheet.html out.png   -> screenshot of a test page (waits for window.done)
 import http from "node:http";
 import fs from "node:fs";
@@ -20,7 +21,7 @@ const server = http.createServer((req, res) => {
 await new Promise((r) => server.listen(0, "127.0.0.1", r));
 const port = server.address().port;
 
-const [, , outArg, spec, extra] = process.argv;
+const [, , outArg, spec, extra, frameArg] = process.argv;
 const browser = await chromium.launch({
   args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist", "--disable-gpu-sandbox"],
 });
@@ -28,7 +29,29 @@ const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, de
 page.on("console", (m) => { if (m.type() === "error" || m.type() === "warning") console.error("[page]", m.text()); });
 page.on("pageerror", (e) => console.error("[pageerror]", e.message));
 
-if (outArg === "page") {
+if (outArg === "manifest") {
+  const manifest = JSON.parse(fs.readFileSync(spec, "utf8"));
+  if (manifest.manifest_version !== 1 || !Number.isInteger(manifest.total_frames) || manifest.total_frames < 1) {
+    throw new Error("Invalid render manifest");
+  }
+  const dataFile = path.join(ROOT, "storyboard-data.js");
+  fs.writeFileSync(dataFile, "window.STORYBOARD_MANIFEST = " + JSON.stringify(manifest) + ";\\n", "utf8");
+  const parse = (s) => s.split(",").flatMap((t) => { const m = t.match(/^(\\d+)-(\\d+)$/); if (!m) return [Number(t)]; const a = []; for (let i = +m[1]; i <= +m[2]; i++) a.push(i); return a; });
+  const frames = parse(frameArg || `0-${manifest.total_frames - 1}`);
+  if (frames.some((f) => !Number.isInteger(f) || f < 0 || f >= manifest.total_frames)) throw new Error("Frame index outside manifest duration");
+  fs.mkdirSync(extra, { recursive: true });
+  await page.goto(`http://127.0.0.1:${port}/index.html`);
+  await page.waitForFunction("window.ready === true", null, { timeout: 300000 });
+  if (await page.evaluate(() => window.TOTAL) !== manifest.total_frames) throw new Error("Browser did not load storyboard frame count");
+  const t0 = Date.now();
+  for (let i = 0; i < frames.length; i++) {
+    const f = frames[i], file = path.join(extra, `f${String(f).padStart(4, "0")}.jpg`);
+    const url = await page.evaluate((n) => window.renderFrame(n), f);
+    fs.writeFileSync(file, Buffer.from(url.split(",")[1], "base64"));
+    if (i % 10 === 0 || frames.length < 40) console.log(`manifest frame ${f} done (${i + 1}/${frames.length}, ${((Date.now() - t0) / (i + 1) / 1000).toFixed(2)} s/frame)`);
+  }
+  console.log(`DONE ${frames.length} storyboard frames in ${((Date.now() - t0) / 1000).toFixed(1)} s`);
+} else if (outArg === "page") {
   await page.setViewportSize({ width: 2400, height: 2200 });
   try {
     await page.goto(`http://127.0.0.1:${port}/${spec}`, { waitUntil: "domcontentloaded", timeout: 120000 });
