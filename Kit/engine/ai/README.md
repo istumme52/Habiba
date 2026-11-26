@@ -32,7 +32,7 @@ The manifest assigns every scene a start frame, exclusive end frame and frame co
 
 **Important:** this manifest is an intermediate planning contract. It is not an executable Three.js scene timeline. Character/environment asset generation and arbitrary-story 3D rendering are not implemented.
 
-## Generate narration audio
+## Render the storyboard as an MP4\n\nAfter creating the manifest and narration, run from the generated project directory:\n\n    ./build_storyboard_video.sh out/render-manifest.json out/narration.mp3 episode\n\nThis renders every frame from the storyboard at 1080×1920 / 30 fps and muxes the narration into `out/episode.mp4`. The narration duration must match the storyboard duration within 0.35 seconds. This first dynamic export uses narration only; sound-effect and music cues remain planning metadata and are not yet synthesized or mixed.\n\n## Generate narration audio
 
 Set:
 - `TTS_API_KEY` (or reuse `AI_API_KEY` if the same provider key supports speech)
@@ -54,4 +54,4 @@ The tool joins scene narration and dialogue in scene order, saves a transcript a
 
 ## Current boundary
 
-The AI tools create storyboard JSON, a frame/timing manifest and narration audio. They do **not** yet generate character/environment assets, execute arbitrary storyboards as 3D scenes, lip-sync dialogue, or export a new-story MP4. The existing renderer still renders the fixed sample episode. Check provider pricing, supported models/voices and data-handling terms before sending content.
+The AI tools create storyboard JSON, a frame/timing manifest and narration audio. The manifest can drive scene timing, camera framing/movement, lighting presets and consistent simple 2D character cards inside the bundled 3D village/mountain set, then export a narrated MP4. Custom AI-generated environment assets, detailed props, fully rigged 3D characters, lip-sync, and automated music/SFX mixing are not yet implemented. The original fixed sample episode remains available too. Check provider pricing, supported models/voices and data-handling terms before sending content.
