@@ -68,6 +68,7 @@ jobs:
           python Kit/engine/audio/test_story_audio.py
           node Kit/engine/ai/storyboard_to_manifest.mjs --input Kit/engine/ai/fixtures/sample-storyboard.json --output "$RUNNER_TEMP/render-manifest.json"
           node Kit/engine/ai/prepare_storyboard.mjs "$RUNNER_TEMP/render-manifest.json" "$RUNNER_TEMP/cartoon-short/web/storyboard-data.js"
+          node Kit/engine/ai/storyboard_to_manifest.mjs --input Kit/engine/ai/fixtures/smoke-storyboard.json --output "$RUNNER_TEMP/smoke-render-manifest.json"
 
       - name: Render storyboard-driven scene frames
         working-directory: ${{ runner.temp }}/cartoon-short
@@ -76,8 +77,8 @@ jobs:
       - name: Export storyboard smoke MP4
         working-directory: ${{ runner.temp }}/cartoon-short
         run: |
-          ffmpeg -y -v error -f lavfi -i "sine=frequency=440:duration=3" -ar 48000 -ac 2 "$RUNNER_TEMP/test-voice.wav"
-          ./build_storyboard_video.sh "$RUNNER_TEMP/render-manifest.json" "$RUNNER_TEMP/test-voice.wav" ci-storyboard
+          ffmpeg -y -v error -f lavfi -i "sine=frequency=440:duration=1" -ar 48000 -ac 2 "$RUNNER_TEMP/test-voice.wav"
+          ./build_storyboard_video.sh "$RUNNER_TEMP/smoke-render-manifest.json" "$RUNNER_TEMP/test-voice.wav" ci-storyboard
           test -s out/ci-storyboard.mp4
 
       - name: Render character design sheet
