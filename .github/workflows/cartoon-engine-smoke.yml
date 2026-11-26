@@ -73,6 +73,13 @@ jobs:
         working-directory: ${{ runner.temp }}/cartoon-short
         run: node render.mjs manifest "$RUNNER_TEMP/render-manifest.json" "$RUNNER_TEMP/manifest-frames" "0,30,89"
 
+      - name: Export storyboard smoke MP4
+        working-directory: ${{ runner.temp }}/cartoon-short
+        run: |
+          ffmpeg -y -v error -f lavfi -i "sine=frequency=440:duration=3" -ar 48000 -ac 2 "$RUNNER_TEMP/test-voice.wav"
+          ./build_storyboard_video.sh "$RUNNER_TEMP/render-manifest.json" "$RUNNER_TEMP/test-voice.wav" ci-storyboard
+          test -s out/ci-storyboard.mp4
+
       - name: Render character design sheet
         working-directory: ${{ runner.temp }}/cartoon-short
         run: node render.mjs page charsheet.html "$RUNNER_TEMP/character-sheet.png"
@@ -95,4 +102,5 @@ jobs:
             ${{ runner.temp }}/world-sheet.png
             ${{ runner.temp }}/story-frames/
             ${{ runner.temp }}/manifest-frames/
+            ${{ runner.temp }}/cartoon-short/out/ci-storyboard.mp4
           if-no-files-found: warn
