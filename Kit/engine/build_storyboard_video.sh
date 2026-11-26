@@ -11,6 +11,7 @@ TITLE="${3:-storyboard}"
 [[ -f "$VOICE" ]] || { echo "ERROR: narration not found: $VOICE" >&2; exit 2; }
 [[ "$TITLE" =~ ^[A-Za-z0-9._-]+$ ]] || { echo "ERROR: output title may contain only letters, numbers, dot, underscore and hyphen." >&2; exit 2; }
 for cmd in node ffmpeg ffprobe python3; do command -v "$cmd" >/dev/null || { echo "ERROR: missing dependency: $cmd" >&2; exit 3; }; done
+python3 -c "import numpy, scipy" >/dev/null 2>&1 || { echo "ERROR: install audio dependencies with: python3 -m pip install -r requirements.txt" >&2; exit 3; }
 node -e "require.resolve('playwright')" >/dev/null 2>&1 || { echo "ERROR: install Playwright in this project first." >&2; exit 3; }
 node -e "require.resolve('./web/node_modules/three')" >/dev/null 2>&1 || { echo "ERROR: Three.js is missing; run setup.sh first." >&2; exit 3; }
 mkdir -p frames out
@@ -30,8 +31,12 @@ if abs(actual - expected) > 0.35:
 print(f"Narration duration OK: {actual:.2f}s")
 PY
 echo "[1/2] Rendering $TOTAL frames at $FPS fps"
-node render.mjs frames "0-$((TOTAL - 1))"
-echo "[2/2] Encoding MP4 with narration"
-ffmpeg -y -v warning -framerate "$FPS" -i "frames/f%04d.jpg" -i "$VOICE" -map 0:v:0 -map 1:a:0 -c:v libx264 -preset medium -crf 19 -pix_fmt yuv420p -c:a aac -b:a 192k -t "$DURATION" -movflags +faststart "out/$TITLE.mp4"
+node render.mjs manifest "$MANIFEST" frames "0-$((TOTAL - 1))"
+echo "[2/3] Generating scene-based original music and sound effects"
+python3 audio/story_audio.py "$MANIFEST" out
+python3 audio/mix.py "$VOICE" out/music.wav out/sfx.wav out/voice-music-sfx.wav
+python3 audio/finish_audio.py out/voice-music-sfx.wav out/final-audio.wav
+echo "[3/3] Encoding MP4 with narration, music and sound effects"
+ffmpeg -y -v warning -framerate "$FPS" -i "frames/f%04d.jpg" -i out/final-audio.wav -map 0:v:0 -map 1:a:0 -c:v libx264 -preset medium -crf 19 -pix_fmt yuv420p -c:a aac -b:a 192k -t "$DURATION" -movflags +faststart "out/$TITLE.mp4"
 ffprobe -v error -show_entries format=duration:stream=codec_name,width,height,r_frame_rate -of json "out/$TITLE.mp4"
 echo "SUCCESS: out/$TITLE.mp4"
