@@ -16,12 +16,13 @@ A vertical 9:16 cartoon-video toolkit with a fixed example and an AI-assisted st
 
 ## Build a new story
 
-Set `AI_API_KEY` and `AI_MODEL`:
+For the full automatic workflow, set `AI_API_KEY`, `AI_MODEL`, `TTS_MODEL`, and `TTS_VOICE` (optionally `TTS_API_KEY` if the speech provider uses a separate key), then run one command:
 
 ```bash
-node ai/plan_story.mjs --prompt "A mysterious lighthouse story" --duration 60 --language English --output out/storyboard.json
-node ai/storyboard_to_manifest.mjs --input out/storyboard.json --output out/render-manifest.json
+./create_story_video.sh "A mysterious lighthouse story" 60 English lighthouse_episode
 ```
+
+For Bangla, replace `English` with `Bangla`. This command creates the storyboard, timing manifest and voiceover, then renders and mixes the MP4. You can also run the individual stages below when you want to review or edit the storyboard first.
 
 For Bangla stories use `--language Bangla`. The planner validates the vertical format, 30 fps, character references and exact duration.
 
