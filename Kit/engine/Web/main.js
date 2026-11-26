@@ -638,6 +638,6 @@ window.renderFrame = (f) => {
   exportCtx.restore();
   return exportCanvas.toDataURL("image/jpeg", 0.95);
 };
-window.TOTAL = TOTAL;
+window.TOTAL = window.STORYBOARD_MANIFEST?.total_frames || TOTAL;
 window.dbgND = () => { const out = []; const buf = new Float32Array(4); for (const [x, y] of [[540, 1700], [540, 1200], [540, 900], [540, 700], [300, 300], [800, 1500]]) { renderer.readRenderTargetPixels(rtND, x, y, 1, 1, buf); out.push([x, y, ...Array.from(buf).map((v) => +v.toFixed(3))]); } return JSON.stringify(out); };
 window.ready = true;
