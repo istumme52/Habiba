@@ -17,6 +17,7 @@ cd "$DST"
 if [ ! -e node_modules ]; then G=$(npm root -g); [ -d "$G/playwright" ] && ln -s "$G" node_modules || echo "install playwright: npm i playwright && npx playwright install chromium"; fi
 echo "ready: $DST"
 echo "Python audio dependencies: python3 -m pip install -r requirements.txt"
+echo "Video/audio encoding requires FFmpeg and ffprobe on PATH."
 echo "Playwright if needed: npm install --no-audit --no-fund playwright && npx playwright install chromium"
 echo "AI storyboard: set AI_API_KEY and AI_MODEL, then run node ai/plan_story.mjs --prompt 'Your story' --duration 60 --language English"
 echo "Storyboard timing manifest: node ai/storyboard_to_manifest.mjs --input out/storyboard.json --output out/render-manifest.json"
