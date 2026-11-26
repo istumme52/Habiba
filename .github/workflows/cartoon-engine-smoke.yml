@@ -42,6 +42,7 @@ jobs:
         run: |
           bash -n Kit/tools/setup.sh
           bash -n Kit/engine/build_video.sh
+          bash -n Kit/engine/build_storyboard_video.sh
           bash -n Kit/engine/finish.sh
           node --check Kit/engine/Web/main.js
           node --check Kit/engine/Web/story.js
@@ -51,6 +52,9 @@ jobs:
           node --check Kit/engine/Web/terrain.js
           node --check Kit/engine/Web/paint.js
           node --check Kit/engine/render.mjs
+          node --check Kit/engine/Web/manifest_runtime.js
+          node --check Kit/engine/ai/prepare_storyboard.mjs
+          node --check Kit/engine/audio/story_audio.py
           node --check Kit/engine/ai/plan_story.mjs
           node Kit/engine/ai/plan_story.mjs --self-test
           node --check Kit/engine/ai/generate_voice.mjs
@@ -58,6 +62,13 @@ jobs:
           node --check Kit/engine/ai/storyboard_to_manifest.mjs
           node Kit/engine/ai/storyboard_to_manifest.mjs --self-test
           python -m py_compile Kit/engine/timing.py Kit/engine/audio/*.py
+          python Kit/engine/audio/test_story_audio.py
+          node Kit/engine/ai/storyboard_to_manifest.mjs --input Kit/engine/ai/fixtures/sample-storyboard.json --output "$RUNNER_TEMP/render-manifest.json"
+          node Kit/engine/ai/prepare_storyboard.mjs "$RUNNER_TEMP/render-manifest.json" "$RUNNER_TEMP/cartoon-short/web/storyboard-data.js"
+
+      - name: Render storyboard-driven scene frames
+        working-directory: ${{ runner.temp }}/cartoon-short
+        run: node render.mjs manifest "$RUNNER_TEMP/render-manifest.json" "$RUNNER_TEMP/manifest-frames" "0,30,89"
 
       - name: Render character design sheet
         working-directory: ${{ runner.temp }}/cartoon-short
@@ -80,5 +91,6 @@ jobs:
             ${{ runner.temp }}/character-sheet.png
             ${{ runner.temp }}/world-sheet.png
             ${{ runner.temp }}/story-frames/
+            ${{ runner.temp }}/manifest-frames/
             ${{ runner.temp }}/manifest-frames/
           if-no-files-found: warn
