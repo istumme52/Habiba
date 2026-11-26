@@ -1,6 +1,6 @@
 # cartoon-audio-short kit
 
-A vertical 9:16 cartoon-video toolkit with a fixed example and an AI-assisted storyboard-to-MP4 workflow.
+A vertical 9:16 cartoon-video toolkit with a fixed example and an AI-assisted storyboard-to-MP4 workflow. Requires Node.js 20+, Playwright/Chromium, Python 3 with NumPy/SciPy, and FFmpeg/ffprobe.
 
 ## Included
 
