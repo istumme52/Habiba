@@ -50,14 +50,14 @@ export function manifestFrameState(frame, manifest) {
     if (/wave|greet/i.test(scene.action || "")) opts.armR = "up";
     return { id: "manifest-" + id, kind, outfit, outfitKey: character.id, pos:[x + Math.sin(local * Math.PI) * (moving ? 1.1 : 0), 14 + (i % 2) * 0.8], dir:[0, moving ? -1 : 1], opts, scale: ids.length > 2 ? 0.82 : 1, pull:0.45 };
   });
-  const cam = cameraFor(scene.camera_shot, scene.camera_movement, local);
+  const cam = cameraFor(scene.camera?.shot || scene.camera_shot, scene.camera?.movement || scene.camera_movement, local);
   return {
     shot: "manifest-scene-" + scene.scene_number,
     cam, light: lightFor(scene.time_of_day), actors, fx: [],
     world: { progress: 0.28, slab:null, plug:null, short:false },
     flash: /flash|white/.test(String(scene.transition || "").toLowerCase()) && local < 0.06 ? 0.25 : 0,
     vign: 0.18,
-    dof: { focus: 24, cInf: /close|detail/i.test(scene.camera_shot || "") ? 5 : 10 },
+    dof: { focus: 24, cInf: /close|detail/i.test(scene.camera?.shot || scene.camera_shot || "") ? 5 : 10 },
     shadow: { c:[0,0,14], r:30 }
   };
 }
