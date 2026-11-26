@@ -49,6 +49,7 @@ jobs:
           bash -n Kit/engine/create_story_video.sh
           bash -n Kit/engine/finish.sh
           node --check Kit/engine/Web/main.js
+          node --check Kit/engine/Web/scene_props.js
           node --check Kit/engine/Web/story.js
           node --check Kit/engine/Web/cast.js
           node --check Kit/engine/Web/castdefs.js
