@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // AI storyboard planner using an OpenAI-compatible Chat Completions endpoint.
-// This creates storyboard JSON; it does not yet generate a new MP4.
+// This creates storyboard JSON for the end-to-end MP4 pipeline.
 import fs from "node:fs/promises";
 import path from "node:path";
 
