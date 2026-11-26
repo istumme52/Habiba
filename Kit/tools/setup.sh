@@ -10,7 +10,7 @@ cp -n "$KIT"/engine/audio/* "$DST/audio/"
 cp -n "$KIT"/engine/ai/* "$DST/ai/"
 chmod +x "$DST/finish.sh" "$DST/build_video.sh"
 cd "$DST/web"
-[ -f package.json ] || printf '{ "name": "short", "private": true, "type": "module" }\\n' > package.json
+[ -f package.json ] || printf '{ "name": "short", "private": true, "type": "module" }\n' > package.json
 [ -d node_modules/three ] || npm i three@0.160.0 --no-audit --no-fund >/dev/null
 cat toonbase.js cast.js > toon.js
 cd "$DST"
