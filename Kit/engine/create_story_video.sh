@@ -17,7 +17,20 @@ TITLE="${4:-episode}"
 if [[ -z "${TTS_API_KEY:-}" && -z "${AI_API_KEY:-}" ]]; then
   echo "ERROR: set TTS_API_KEY or AI_API_KEY." >&2; exit 2
 fi
-for cmd in node python3 ffmpeg ffprobe; do command -v "$cmd" >/dev/null || { echo "ERROR: missing dependency: $cmd" >&2; exit 3; }; done
+
+# Preflight every local dependency before making paid AI/TTS requests.
+for cmd in node python3 ffmpeg ffprobe; do
+  command -v "$cmd" >/dev/null || { echo "ERROR: missing dependency: $cmd" >&2; exit 3; }
+done
+python3 -c "import numpy, scipy" >/dev/null 2>&1 || {
+  echo "ERROR: Python audio packages are missing. Run: python3 -m pip install -r requirements.txt" >&2; exit 3;
+}
+node -e "require.resolve('playwright')" >/dev/null 2>&1 || {
+  echo "ERROR: Playwright is missing. Install it with: npm install playwright && npx playwright install chromium" >&2; exit 3;
+}
+node -e "require.resolve('./web/node_modules/three')" >/dev/null 2>&1 || {
+  echo "ERROR: Three.js is missing. Run the project setup script again." >&2; exit 3;
+}
 mkdir -p out
 echo "[1/4] Planning story"
 node ai/plan_story.mjs --prompt "$PROMPT" --duration "$DURATION" --language "$LANGUAGE" --output out/storyboard.json
