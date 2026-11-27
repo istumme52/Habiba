@@ -120,7 +120,8 @@ export function createSceneProps(scene) {
       const side=i%2===0?-1:1, row=Math.floor(i/2);
       const offset=layout[kind](side,row); o.position.set(...offset);
       if(kind==="car") o.rotation.y=side<0?-.16:Math.PI+.16;
-      if(kind==="bicycle") o.rotation.y=side<0?-.35:Math.PI+.35;\n      if(kind==="motorcycle") o.rotation.y=side<0?-.25:Math.PI+.25;
+      if(kind==="bicycle") o.rotation.y=side<0?-.35:Math.PI+.35;
+      if(kind==="motorcycle") o.rotation.y=side<0?-.25:Math.PI+.25;
       if(kind==="house"||kind==="tent"||kind==="bench") o.rotation.y=side<0?-.25:Math.PI+.25;
       if(kind==="water"||kind==="bridge") o.rotation.y=0;
     });
