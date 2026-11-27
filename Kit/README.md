@@ -42,6 +42,23 @@ python3 -m pip install -r requirements.txt
 
 The output is `out/episode.mp4` (1080×1920, 30 fps). Scene mood and sound-effect cues generate simple original procedural music/SFX; the script mixes these with narration and applies final loudness processing. Voice duration is automatically pitch-preserved to fit within 0.80×–1.25×; larger mismatches need a re-record or edit.
 
+## Run a story from GitHub Actions (phone-friendly)
+
+You can start a cloud render from the GitHub website without running Node.js or FFmpeg on your Android phone.
+
+1. In the repository, open **Settings → Secrets and variables → Actions** and add these repository secrets:
+   - `AI_API_KEY`: key for the storyboard Chat Completions provider.
+   - `AI_MODEL`: a model supported by that provider.
+   - `TTS_MODEL`: a speech model supported by your TTS endpoint.
+   - `TTS_VOICE`: a voice supported by that endpoint.
+   - Optional: `TTS_API_KEY`, `AI_API_URL`, `TTS_API_URL`.
+2. Open the repository's **Actions** tab.
+3. Select **Generate story video**, then choose **Run workflow**.
+4. Enter the story idea, duration (15–600 seconds), language and output title.
+5. Wait for the workflow to finish successfully. Open its run, scroll to **Artifacts**, and download the generated MP4 and storyboard files. Artifacts are retained for 7 days.
+
+The workflow runs on a GitHub-hosted Ubuntu machine. API usage may incur charges from your chosen providers. Never put API keys in the story prompt, source files or chat messages. A failed run will show its error in the workflow log; a completed CI smoke test does not mean a real episode has been generated.
+
 ## Existing example
 
 ```bash
