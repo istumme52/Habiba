@@ -11,7 +11,7 @@ const manifest = {
   scenes: [{
     scene_number: 1, start_frame: 0, end_frame_exclusive: 30, frame_count: 30,
     location: "Village street beside a river",
-    background: "A quiet village road with trees and houses",
+    background: "A quiet village road with trees, houses and a motorcycle",
     time_of_day: "Morning",
     character_ids: ["hero"],
     action: "The hero stands and speaks",
@@ -28,7 +28,7 @@ assert.equal(closed.actors[0].opts.expr, "talkClosed");
 assert.equal(openAgain.actors[0].opts.expr, "talkOpen");
 assert.ok(open.props.includes("tree"));
 assert.ok(open.props.includes("house"));
-assert.ok(open.props.includes("road"));
+assert.ok(open.props.includes("road"));\nassert.ok(open.props.includes("motorcycle"));
 assert.ok(open.props.includes("water"));
 assert.ok(open.props.includes("bridge"));
 
