@@ -237,7 +237,7 @@ export const bodyFrontX = (p, o, opts) => {
 };
 
 // ---------------- side view (facing screen-right) ----------------
-/** modes: walk (planted feet, cycloid swing), stand, hammer (two-handed sledge: k 0 raised .. 1 struck), fallen */
+/** modes: walk/run (planted-foot locomotion), stand, hammer, fallen */
 export const bodySideX = (p, o, opts) => {
   const { phase = 0, expr = "neutral", mode = "walk", blink = false, k = 0, stride = 1, light = DEF_LIGHT, seed = 1, lean0 = 0, pot = false, look = 0.6 } = opts;
   const Bd = BUILD[o.build ?? "adult"], skin = o.skin ?? SKIN, two = Math.PI * 2, lid = lidOf(blink);
@@ -247,8 +247,9 @@ export const bodySideX = (p, o, opts) => {
   const legLen = (Bd.legs + 0.12) * HH - 4 * u, l1 = legLen / 2, l2 = legLen / 2;
   const legs = [];
   let hipY = ankY - legLen * 0.995, lean = lean0, nearFwd = 0;
-  if (mode === "walk") {
-    const S = 370 * stride * 0.85, liftH = 26;
+  if (mode === "walk" || mode === "run") {
+    const running = mode === "run";
+    const S = (running ? 520 : 370) * stride * 0.85, liftH = running ? 52 : 26;
     const st = (ph) => {
       const c = (((phase + ph) % 1) + 1) % 1;
       if (c < 0.5) { const s = c / 0.5; return { x: S / 2 - S * s, h: 0, stance: true, s }; }
@@ -259,7 +260,7 @@ export const bodySideX = (p, o, opts) => {
     const Leff = legLen * (1 - 0.03 * Math.sin(Math.PI * stance.s));
     hipY = ankY - Math.sqrt(Math.max(1, Leff * Leff - stance.x * stance.x));
     for (const [L, near] of [[fL, false], [nL, true]]) legs.push({ ank: [300 + L.x, ankY - L.h], pitch: L.stance ? 0 : rad(30 * Math.sin(Math.PI * L.s) * (1 - 1.6 * L.s)), near });
-    lean += 3 + 2 * Math.cos(2 * two * phase);
+    lean += running ? 12 + 4 * Math.cos(2 * two * phase) : 3 + 2 * Math.cos(2 * two * phase);
     nearFwd = nL.x / (S / 2);
   } else if (mode === "hammer") {
     hipY = ankY - 0.9 * legLen;
@@ -322,8 +323,9 @@ export const bodySideX = (p, o, opts) => {
     far = [S, [S[0] - 22 * u, S[1] - 0.32 * HH], [300 - 30 * u, crown - 0.08 * HH]];
     near = swingArm(rad(-25) * nearFwd);
   } else {
-    near = swingArm(rad(-28) * nearFwd);
-    far = mode === "walk" ? swingArm(rad(28) * nearFwd) : null;
+    const armSwing = mode === "run" ? 42 : 28;
+    near = swingArm(rad(-armSwing) * nearFwd);
+    far = mode === "walk" || mode === "run" ? swingArm(rad(armSwing) * nearFwd) : null;
   }
   if (far) { p.stroke(curve(far[0], far[1], far[2]), 5.2 * u, farArm); hand(far[2], skinFar); }
   if (mode === "hammer" && k < 0.5) hammerDraw(p, grip, hAng, 0.95 * HH, u); // raised: behind the body
