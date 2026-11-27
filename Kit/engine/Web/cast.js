@@ -12,6 +12,9 @@ FACE.squint = { eye: ["slit", "slit"], brow: [3, -1], mouth: "dash" };
 FACE.mock = { eye: ["happy", "happy"], brow: [-3, -3], mouth: "smileWide" };
 FACE.worried = { eye: ["small", "small"], brow: [-4, 3], mouth: "wave" };
 FACE.calm = { eye: ["lid", "lid"], brow: [-1, 1], mouth: "smile" };
+// Simple deterministic mouth flap for character dialogue; this is not phoneme-level lip sync.
+FACE.talkOpen = { eye: ["lid", "lid"], brow: [0, -1], mouth: "O" };
+FACE.talkClosed = { eye: ["lid", "lid"], brow: [0, -1], mouth: "dash" };
 
 const GAM_W = "#f4ead8";
 /** red gamchha band with two thin cream stripes (check cloth) */
