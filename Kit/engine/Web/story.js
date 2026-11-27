@@ -1,4 +1,5 @@
 // Staging for "The Man Who Moved a Mountain": every value is a pure function of the frame number.
+import { manifestFrameState } from "./manifest_runtime.js";
 import { clamp, lin, smooth, smoother, easeOut, easeIn, easeInOut, back, spring, lerp, lerp3, add3, catmull, camKeys, kick, blinkAt, idle, q } from "./motion.js";
 import { groundAt, chanEnd, floorH, terrainH } from "./terrain.js";
 import { MANJHI_Y, MANJHI_M, MANJHI_O, FALGUNI, VIL_1, VIL_2, VIL_3, VIL_4, VIL_5, KID } from "./castdefs.js";
@@ -365,6 +366,7 @@ export const SHOTLIST = SHOTS.map((s) => ({ id: s.id, a: s.a, b: s.b }));
 export const shotAt = (f) => SHOTS.find((s) => f >= s.a && f < s.b) || SHOTS[SHOTS.length - 1];
 
 export const frameState = (f) => {
+  if (typeof window !== "undefined" && window.STORYBOARD_MANIFEST) return manifestFrameState(f, window.STORYBOARD_MANIFEST);
   const s = shotAt(f), r = s.fn(f);
   const cam = { ...r.cam, pos: [...r.cam.pos], look: [...r.cam.look] };
   // creeping push on every frame (no static holds) and impact kicks

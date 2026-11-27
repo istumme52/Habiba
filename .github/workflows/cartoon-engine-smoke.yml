@@ -28,6 +28,9 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
       - name: Install Python dependencies
         run: python -m pip install -r Kit/engine/requirements.txt
 
@@ -42,8 +45,11 @@ jobs:
         run: |
           bash -n Kit/tools/setup.sh
           bash -n Kit/engine/build_video.sh
+          bash -n Kit/engine/build_storyboard_video.sh
+          bash -n Kit/engine/create_story_video.sh
           bash -n Kit/engine/finish.sh
           node --check Kit/engine/Web/main.js
+          node --check Kit/engine/Web/scene_props.js
           node --check Kit/engine/Web/story.js
           node --check Kit/engine/Web/cast.js
           node --check Kit/engine/Web/castdefs.js
@@ -51,7 +57,31 @@ jobs:
           node --check Kit/engine/Web/terrain.js
           node --check Kit/engine/Web/paint.js
           node --check Kit/engine/render.mjs
+          node --check Kit/engine/Web/manifest_runtime.js
+          node Kit/engine/Web/test_manifest_runtime.mjs
+          node --check Kit/engine/ai/prepare_storyboard.mjs
+          node --check Kit/engine/ai/plan_story.mjs
+          node Kit/engine/ai/plan_story.mjs --self-test
+          node --check Kit/engine/ai/generate_voice.mjs
+          node Kit/engine/ai/generate_voice.mjs --self-test
+          node --check Kit/engine/ai/storyboard_to_manifest.mjs
+          node Kit/engine/ai/storyboard_to_manifest.mjs --self-test
           python -m py_compile Kit/engine/timing.py Kit/engine/audio/*.py
+          python Kit/engine/audio/test_story_audio.py
+          node Kit/engine/ai/storyboard_to_manifest.mjs --input Kit/engine/ai/fixtures/sample-storyboard.json --output "$RUNNER_TEMP/render-manifest.json"
+          node Kit/engine/ai/prepare_storyboard.mjs "$RUNNER_TEMP/render-manifest.json" "$RUNNER_TEMP/cartoon-short/web/storyboard-data.js"
+          node Kit/engine/ai/storyboard_to_manifest.mjs --input Kit/engine/ai/fixtures/smoke-storyboard.json --output "$RUNNER_TEMP/smoke-render-manifest.json"
+
+      - name: Render storyboard-driven scene frames
+        working-directory: ${{ runner.temp }}/cartoon-short
+        run: node render.mjs manifest "$RUNNER_TEMP/render-manifest.json" "$RUNNER_TEMP/manifest-frames" "0,30,89"
+
+      - name: Export storyboard smoke MP4
+        working-directory: ${{ runner.temp }}/cartoon-short
+        run: |
+          ffmpeg -y -v error -f lavfi -i "sine=frequency=440:duration=1" -ar 48000 -ac 2 "$RUNNER_TEMP/test-voice.wav"
+          ./build_storyboard_video.sh "$RUNNER_TEMP/smoke-render-manifest.json" "$RUNNER_TEMP/test-voice.wav" ci-storyboard
+          test -s out/ci-storyboard.mp4
 
       - name: Render character design sheet
         working-directory: ${{ runner.temp }}/cartoon-short
@@ -74,4 +104,6 @@ jobs:
             ${{ runner.temp }}/character-sheet.png
             ${{ runner.temp }}/world-sheet.png
             ${{ runner.temp }}/story-frames/
+            ${{ runner.temp }}/manifest-frames/
+            ${{ runner.temp }}/cartoon-short/out/ci-storyboard.mp4
           if-no-files-found: warn

@@ -5,6 +5,7 @@ import * as P from "./paint.js";
 import { ridgeH, terrainH, groundAt, chanEnd, W0, CH, fbm } from "./terrain.js";
 import { frameState, TOTAL, VILLAGE, ROAD, LANE, CLINIC, SHORT } from "./story.js";
 import { CHANNEL_MASCOT } from "./castdefs.js";
+import { createSceneProps } from "./scene_props.js";
 
 const W = 1080, H = 1920, PX = W / 1080;
 const NOINK = 1;
@@ -29,6 +30,7 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 
 const scene = new THREE.Scene();
+const updateSceneProps = createSceneProps(scene);
 const camera = new THREE.PerspectiveCamera(40, W / H, 0.1, 3000);
 camera.layers.enableAll();
 scene.fog = new THREE.Fog(0xb8d0ec, 80, 900);
@@ -73,6 +75,8 @@ const MAT = {
   mustard: triToon(ctex(P.grassTex(41, 512, "#d9b93c")), 10), paddy: triToon(ctex(P.grassTex(42, 512, "#7fa84a")), 10),
 };
 const world = []; // meshes that get inked
+// Register storyboard prop meshes for the normal/depth pass so they receive consistent outlines and depth.
+scene.getObjectByName("storyboard-scene-props")?.traverse((o) => { if (o.isMesh && !world.includes(o)) world.push(o); });
 const addW = (mesh, cast = true, recv = true) => { mesh.castShadow = cast; mesh.receiveShadow = recv; mesh.layers.set(0); scene.add(mesh); world.push(mesh); return mesh; };
 
 // ---------- world ----------
@@ -528,6 +532,7 @@ const camRightOf = () => { const r = new THREE.Vector3(); camera.matrixWorld.ext
 
 window.renderFrame = (f) => {
   const S = frameState(f);
+  updateSceneProps(S.props || []);
   setProgress(S.world.progress);
   shortRoad.visible = !!S.world.short;
   for (const [r, v] of [[routeLong, S.world.routeLong], [routeShort, S.world.routeShort]]) {
@@ -638,6 +643,6 @@ window.renderFrame = (f) => {
   exportCtx.restore();
   return exportCanvas.toDataURL("image/jpeg", 0.95);
 };
-window.TOTAL = TOTAL;
+window.TOTAL = window.STORYBOARD_MANIFEST?.total_frames || TOTAL;
 window.dbgND = () => { const out = []; const buf = new Float32Array(4); for (const [x, y] of [[540, 1700], [540, 1200], [540, 900], [540, 700], [300, 300], [800, 1500]]) { renderer.readRenderTargetPixels(rtND, x, y, 1, 1, buf); out.push([x, y, ...Array.from(buf).map((v) => +v.toFixed(3))]); } return JSON.stringify(out); };
 window.ready = true;

@@ -12,6 +12,9 @@ FACE.squint = { eye: ["slit", "slit"], brow: [3, -1], mouth: "dash" };
 FACE.mock = { eye: ["happy", "happy"], brow: [-3, -3], mouth: "smileWide" };
 FACE.worried = { eye: ["small", "small"], brow: [-4, 3], mouth: "wave" };
 FACE.calm = { eye: ["lid", "lid"], brow: [-1, 1], mouth: "smile" };
+// Simple deterministic mouth flap for character dialogue; this is not phoneme-level lip sync.
+FACE.talkOpen = { eye: ["lid", "lid"], brow: [0, -1], mouth: "O" };
+FACE.talkClosed = { eye: ["lid", "lid"], brow: [0, -1], mouth: "dash" };
 
 const GAM_W = "#f4ead8";
 /** red gamchha band with two thin cream stripes (check cloth) */
@@ -140,19 +143,20 @@ export const bodyFrontX = (p, o, opts) => {
     // pleats
     for (const dx of [-6, 0, 6]) p.stroke([[300 + dx * u, hipY + 0.2 * HH], [300 + dx * 1.6 * u, sole - 0.12 * HH]], 1.6 * u, mul(o.sari, [0.7, 0.7, 0.75]));
   } else {
-    const hem = hipY + (o.shorts ? 0.3 : 0.7) * (sole - hipY);
+    const hem = hipY + (o.shorts ? 0.3 : o.pants ? 0.94 : 0.7) * (sole - hipY);
     for (const side of [-1, 1]) {
       const fx = 300 + side * 20 * u, fy = sole - 4 * u;
       p.stroke([[300 + side * 15 * u, hem - 10 * u], [fx, fy]], 5.6 * u, skinLeg);
       foot(fx, fy + 3 * u, side);
     }
-    const lowCol = o.dhoti || o.shorts;
+    const lowCol = o.dhoti || o.shorts || o.pants;
     if (lowCol) {
       const pts = [[300 - 34 * u, hipY - 0.05 * HH], [300 + 34 * u, hipY - 0.05 * HH], [300 + 44 * u, hem], [300 + 10 * u, hem + 6 * u], [300, hem - 14 * u], [300 - 10 * u, hem + 6 * u], [300 - 44 * u, hem]];
       p.gradFill(pts, lowCol, mul(lowCol, SH_CLOTH), light);
       p.poly(pts, null, ow * 0.85);
       p.stroke([[300 + 4 * u, hipY + 0.05 * HH], [300 + 2 * u, hem - 16 * u]], 1.8 * u, mul(lowCol, [0.7, 0.7, 0.75]));
       if (o.dhoti) p.stroke([[300 - 22 * u, hipY + 0.2 * HH], [300 - 28 * u, hem - 4 * u]], 1.4 * u, mul(lowCol, [0.75, 0.75, 0.8]));
+      else if (o.pants) p.stroke([[300 - 20 * u, hipY + 0.25 * HH], [300 - 23 * u, hem - 4 * u]], 1.4 * u, mul(lowCol, [0.72, 0.72, 0.78]));
     }
   }
   // ---- upper body ----
@@ -233,7 +237,7 @@ export const bodyFrontX = (p, o, opts) => {
 };
 
 // ---------------- side view (facing screen-right) ----------------
-/** modes: walk (planted feet, cycloid swing), stand, hammer (two-handed sledge: k 0 raised .. 1 struck), fallen */
+/** modes: walk/run (planted-foot locomotion), stand, hammer, fallen */
 export const bodySideX = (p, o, opts) => {
   const { phase = 0, expr = "neutral", mode = "walk", blink = false, k = 0, stride = 1, light = DEF_LIGHT, seed = 1, lean0 = 0, pot = false, look = 0.6 } = opts;
   const Bd = BUILD[o.build ?? "adult"], skin = o.skin ?? SKIN, two = Math.PI * 2, lid = lidOf(blink);
@@ -243,8 +247,9 @@ export const bodySideX = (p, o, opts) => {
   const legLen = (Bd.legs + 0.12) * HH - 4 * u, l1 = legLen / 2, l2 = legLen / 2;
   const legs = [];
   let hipY = ankY - legLen * 0.995, lean = lean0, nearFwd = 0;
-  if (mode === "walk") {
-    const S = 370 * stride * 0.85, liftH = 26;
+  if (mode === "walk" || mode === "run") {
+    const running = mode === "run";
+    const S = (running ? 520 : 370) * stride * 0.85, liftH = running ? 52 : 26;
     const st = (ph) => {
       const c = (((phase + ph) % 1) + 1) % 1;
       if (c < 0.5) { const s = c / 0.5; return { x: S / 2 - S * s, h: 0, stance: true, s }; }
@@ -255,7 +260,7 @@ export const bodySideX = (p, o, opts) => {
     const Leff = legLen * (1 - 0.03 * Math.sin(Math.PI * stance.s));
     hipY = ankY - Math.sqrt(Math.max(1, Leff * Leff - stance.x * stance.x));
     for (const [L, near] of [[fL, false], [nL, true]]) legs.push({ ank: [300 + L.x, ankY - L.h], pitch: L.stance ? 0 : rad(30 * Math.sin(Math.PI * L.s) * (1 - 1.6 * L.s)), near });
-    lean += 3 + 2 * Math.cos(2 * two * phase);
+    lean += running ? 12 + 4 * Math.cos(2 * two * phase) : 3 + 2 * Math.cos(2 * two * phase);
     nearFwd = nL.x / (S / 2);
   } else if (mode === "hammer") {
     hipY = ankY - 0.9 * legLen;
@@ -271,7 +276,7 @@ export const bodySideX = (p, o, opts) => {
   const footS = (L, near) => {
     const c = Math.cos(L.pitch), s = Math.sin(L.pitch);
     const a = [L.ank[0] - 3 * u * c, L.ank[1] - 3 * u * s], b = [L.ank[0] + 13 * u * c, L.ank[1] + 13 * u * s + 0.5 * u];
-    p.stroke([a, b], 7.5 * u + 3, INK); p.stroke([a, b], 7.5 * u, near ? skin : skinFar);
+    p.stroke([a, b], 7.5 * u + 3, INK); p.stroke([a, b], 7.5 * u, o.boots || (near ? skin : skinFar));
   };
   if (o.sari && !o.dhoti) {
     legs.forEach((L) => footS(L, L.near));
@@ -286,6 +291,7 @@ export const bodySideX = (p, o, opts) => {
       const kn = knees[i], hp0 = [300 + (L.near ? 0 : -5 * u), hipY];
       p.stroke([kn, L.ank], 5.4 * u, L.near ? skinLeg : skinFar);
       if (o.dhoti) p.line([hp0, kn, lerp2(kn, L.ank, 0.18)], L.near ? o.dhoti : mul(o.dhoti, [0.8, 0.8, 0.86]), 13 * u);
+      else if (o.pants) p.line([hp0, kn, L.ank], L.near ? o.pants : mix(o.pants, INK, 0.18), 13 * u);
       else p.stroke([hp0, kn], 5.8 * u, mix(o.pants || "#555", INK, 0.5));
       footS(L, L.near);
     });
@@ -317,8 +323,9 @@ export const bodySideX = (p, o, opts) => {
     far = [S, [S[0] - 22 * u, S[1] - 0.32 * HH], [300 - 30 * u, crown - 0.08 * HH]];
     near = swingArm(rad(-25) * nearFwd);
   } else {
-    near = swingArm(rad(-28) * nearFwd);
-    far = mode === "walk" ? swingArm(rad(28) * nearFwd) : null;
+    const armSwing = mode === "run" ? 42 : 28;
+    near = swingArm(rad(-armSwing) * nearFwd);
+    far = mode === "walk" || mode === "run" ? swingArm(rad(armSwing) * nearFwd) : null;
   }
   if (far) { p.stroke(curve(far[0], far[1], far[2]), 5.2 * u, farArm); hand(far[2], skinFar); }
   if (mode === "hammer" && k < 0.5) hammerDraw(p, grip, hAng, 0.95 * HH, u); // raised: behind the body
