@@ -60,7 +60,8 @@ export function manifestFrameState(frame, manifest) {
   if (has(/forest|jungle|park|mountain|hill|nature|village|outdoor|field|garden|tree/)) { props.add("tree"); props.add("bird"); }
   if (has(/village|town|house|home|neighbourhood|school|hospital|clinic|station|building/)) { props.add("house"); props.add("fence"); }
   if (has(/city|urban|street|road|traffic|car|vehicle|market/)) { props.add("road"); props.add("car"); props.add("lamp"); props.add("sign"); }
-  if (has(/bicycle|cycle|cycling/)) props.add("bicycle");\n  if (has(/motorcycle|motorbike|motor cycle|scooter|\\bbike\\b/)) props.add("motorcycle");
+  if (has(/bicycle|cycle|cycling/)) props.add("bicycle");
+  if (has(/motorcycle|motorbike|motor cycle|scooter|bike\\b/)) props.add("motorcycle");
   if (has(/river|lake|sea|ocean|waterfall|water bank|shore/)) { props.add("water"); props.add("bridge"); }
   if (has(/camp|camping|tent|wilderness/)) { props.add("tent"); props.add("tree"); props.add("bird"); }
   if (has(/park|garden|bus stop|waiting/)) props.add("bench");
