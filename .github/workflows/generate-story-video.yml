@@ -1,0 +1,97 @@
+name: Generate story video
+
+on:
+  workflow_dispatch:
+    inputs:
+      prompt:
+        description: Story idea or episode brief
+        required: true
+        type: string
+      duration:
+        description: Video duration in seconds (15-600)
+        required: true
+        default: "60"
+        type: string
+      language:
+        description: Narration language
+        required: true
+        default: Bangla
+        type: string
+      title:
+        description: Output filename without extension (letters, numbers, dot, underscore, hyphen)
+        required: true
+        default: episode
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      AI_API_KEY: ${{ secrets.AI_API_KEY }}
+      AI_MODEL: ${{ secrets.AI_MODEL }}
+      AI_API_URL: ${{ secrets.AI_API_URL }}
+      TTS_API_KEY: ${{ secrets.TTS_API_KEY }}
+      TTS_API_URL: ${{ secrets.TTS_API_URL }}
+      TTS_MODEL: ${{ secrets.TTS_MODEL }}
+      TTS_VOICE: ${{ secrets.TTS_VOICE }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install Python audio dependencies
+        run: python -m pip install -r Kit/engine/requirements.txt
+
+      - name: Prepare video project
+        run: |
+          bash Kit/tools/setup.sh "$RUNNER_TEMP/story-video"
+          cd "$RUNNER_TEMP/story-video"
+          npm install --no-audit --no-fund playwright
+          npx playwright install --with-deps chromium
+
+      - name: Validate required secrets
+        run: |
+          test -n "$AI_API_KEY" || { echo "Missing repository secret AI_API_KEY"; exit 2; }
+          test -n "$AI_MODEL" || { echo "Missing repository secret AI_MODEL"; exit 2; }
+          test -n "$TTS_MODEL" || { echo "Missing repository secret TTS_MODEL"; exit 2; }
+          test -n "$TTS_VOICE" || { echo "Missing repository secret TTS_VOICE"; exit 2; }
+
+      - name: Generate storyboard, narration and MP4
+        env:
+          STORY_PROMPT: ${{ inputs.prompt }}
+          STORY_DURATION: ${{ inputs.duration }}
+          STORY_LANGUAGE: ${{ inputs.language }}
+          STORY_TITLE: ${{ inputs.title }}
+        run: |
+          cd "$RUNNER_TEMP/story-video"
+          ./create_story_video.sh "$STORY_PROMPT" "$STORY_DURATION" "$STORY_LANGUAGE" "$STORY_TITLE"
+          test -s "out/$STORY_TITLE.mp4"
+          ffprobe -v error -show_entries format=duration:stream=codec_name,width,height,r_frame_rate -of json "out/$STORY_TITLE.mp4"
+
+      - name: Upload generated video and project outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: story-video-${{ inputs.title }}
+          path: |
+            ${{ runner.temp }}/story-video/out/*.mp4
+            ${{ runner.temp }}/story-video/out/storyboard.json
+            ${{ runner.temp }}/story-video/out/render-manifest.json
+            ${{ runner.temp }}/story-video/out/narration.txt
+          if-no-files-found: error
+          retention-days: 7
