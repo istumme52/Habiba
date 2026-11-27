@@ -1,7 +1,7 @@
 // Reusable low-poly 3D scene props for storyboard-driven environments.
 import * as THREE from "three";
 
-const mat = (color, roughness = 1) => new THREE.MeshStandardMaterial({ color, roughness, flatShading: true });
+const mat = (color, roughness = 1, transparent = false, opacity = 1) => new THREE.MeshStandardMaterial({ color, roughness, flatShading: true, transparent, opacity });
 const box = (w,h,d,m,x=0,y=0,z=0) => { const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m); o.position.set(x,y,z); o.castShadow=true; o.receiveShadow=true; return o; };
 const cyl = (r1,r2,h,m,x=0,y=0,z=0,segments=8) => { const o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,segments),m); o.position.set(x,y,z); o.castShadow=true; return o; };
 const sphere = (r,m,x=0,y=0,z=0) => { const o=new THREE.Mesh(new THREE.IcosahedronGeometry(r,1),m); o.position.set(x,y,z); o.castShadow=true; return o; };
@@ -15,7 +15,7 @@ function tree() {
 function house() {
   const g=new THREE.Group(), wall=mat("#d5b58a"), roof=mat("#8d5140"), dark=mat("#493b35");
   g.add(box(2.8,2.1,2.5,wall,0,1.05,0));
-  const roofMesh=new THREE.Mesh(new THREE.ConeGeometry(2.15,1.45,4),roof); roofMesh.position.set(0,2.82,0); roofMesh.rotation.y=Math.PI/4; roofMesh.castShadow=true; g.add(roofMesh);
+  const r=new THREE.Mesh(new THREE.ConeGeometry(2.15,1.45,4),roof); r.position.set(0,2.82,0); r.rotation.y=Math.PI/4; r.castShadow=true; g.add(r);
   g.add(box(.62,1.15,.08,dark,0,.58,1.29),box(.48,.65,.08,mat("#83a9b8"),-.83,1.25,1.29),box(.48,.65,.08,mat("#83a9b8"),.83,1.25,1.29));
   return g;
 }
@@ -47,35 +47,70 @@ function road() {
   for(let z=-11;z<=11;z+=4) g.add(box(.12,.025,1.6,line,0,.125,z));
   return g;
 }
-const factories={tree,house,lamp,car,bicycle,bird,road};
+function tent() {
+  const g=new THREE.Group(), canvas=mat("#c5a66b"), dark=mat("#654b34");
+  const a=new THREE.Mesh(new THREE.ConeGeometry(2.2,2.7,4),canvas); a.position.y=1.35; a.rotation.y=Math.PI/4; g.add(a);
+  g.add(box(.9,1.35,.08,dark,0,.68,1.02));
+  return g;
+}
+function bridge() {
+  const g=new THREE.Group(), wood=mat("#795638");
+  g.add(box(5,.22,9,wood,0,1.1,0));
+  for(const x of [-2.25,2.25]) {
+    g.add(box(.14,1.1,9,wood,x,1.55,0));
+    for(let z=-4;z<=4;z+=2) g.add(box(.14,.55,.14,wood,x,2.25,z));
+  }
+  return g;
+}
+function fence() {
+  const g=new THREE.Group(), wood=mat("#876342");
+  for(let x=-3;x<=3;x+=1.5) g.add(box(.12,1.1,.12,wood,x,.55,0));
+  g.add(box(6,.12,.12,wood,0,.8,0),box(6,.12,.12,wood,0,.35,0));
+  return g;
+}
+function bench() {
+  const g=new THREE.Group(), wood=mat("#8c603c"), metal=mat("#42484d");
+  g.add(box(2,.14,.62,wood,0,.85,0),box(2,.72,.12,wood,0,1.25,-.24));
+  for(const x of [-.75,.75]) g.add(box(.12,.8,.12,metal,x,.4,0));
+  return g;
+}
+function sign() {
+  const g=new THREE.Group(), post=mat("#594630"), board=mat("#d7c18a");
+  g.add(cyl(.08,.1,2.5,post,0,1.25,0),box(1.8,.75,.12,board,0,2.15,0));
+  return g;
+}
+function water() {
+  const g=new THREE.Group(), blue=mat("#4e9fc0",.35,true,.82);
+  const plane=new THREE.Mesh(new THREE.PlaneGeometry(18,32),blue); plane.rotation.x=-Math.PI/2; plane.position.y=.08; g.add(plane);
+  return g;
+}
+const factories={tree,house,lamp,car,bicycle,bird,road,tent,bridge,fence,bench,sign,water};
 export function createSceneProps(scene) {
   const root=new THREE.Group(); root.name="storyboard-scene-props";
   const groups={};
   for(const [kind,make] of Object.entries(factories)) {
     groups[kind]=[];
-    const count=kind==="tree"?5:kind==="bird"?3:kind==="lamp"?2:kind==="house"?2:1;
+    const count=kind==="tree"?5:kind==="bird"?3:kind==="lamp"||kind==="house"||kind==="fence"?2:1;
     for(let i=0;i<count;i++){ const obj=make(); root.add(obj); groups[kind].push(obj); }
   }
   scene.add(root);
+  const layout={
+    tree:(s,r)=>[s*(8+r*2),0,12+r*5], house:(s,r)=>[s*11,0,20+r*8],
+    lamp:(s,r)=>[s*5.5,0,10+r*14], car:(s)=>[s*4.8,0,18],
+    bicycle:(s)=>[s*4.5,0,13], bird:(s,r)=>[s*(3+r*2),6+r,9+r*5],
+    road:()=>[0,0,22],tent:(s)=>[s*8,0,17],bridge:()=>[0,0,25],
+    fence:(s)=>[s*8,0,16],bench:(s)=>[s*5,0,12],sign:(s)=>[s*6,0,10],water:()=>[0,0,32]
+  };
   return (requested=[]) => {
     const kinds=new Set(requested);
     for(const [kind,items] of Object.entries(groups)) items.forEach((o,i)=>{
-      o.visible=kinds.has(kind);
-      if(!o.visible) return;
+      o.visible=kinds.has(kind); if(!o.visible) return;
       const side=i%2===0?-1:1, row=Math.floor(i/2);
-      const offsets={
-        tree:[side*(7.5+row*2.2),0,12+row*4],
-        house:[side*10,0,18+row*7],
-        lamp:[side*5.2,0,9+row*13],
-        car:[side*4.8,0,17],
-        bicycle:[side*4.4,0,13],
-        bird:[side*(3+row*2),5+row*1.1,9+row*4],
-        road:[0,0,20]
-      }[kind];
-      o.position.set(...offsets);
+      const offset=layout[kind](side,row); o.position.set(...offset);
       if(kind==="car") o.rotation.y=side<0?-.16:Math.PI+.16;
       if(kind==="bicycle") o.rotation.y=side<0?-.35:Math.PI+.35;
-      if(kind==="house") o.rotation.y=side<0?-.25:Math.PI+.25;
+      if(kind==="house"||kind==="tent"||kind==="bench") o.rotation.y=side<0?-.25:Math.PI+.25;
+      if(kind==="water"||kind==="bridge") o.rotation.y=0;
     });
   };
 }
