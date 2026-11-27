@@ -51,12 +51,15 @@ export function manifestFrameState(frame, manifest) {
   const cam = cameraFor(scene.camera?.shot || scene.camera_shot, scene.camera?.movement || scene.camera_movement, local);
   const description = [scene.location, scene.background, scene.action, scene.title].filter(Boolean).join(" ").toLowerCase();
   const props = new Set();
-  if (/forest|jungle|park|mountain|hill|nature|village|outdoor|field|river|lake|camp|road|street|garden|tree/.test(description)) { props.add("tree"); props.add("bird"); }
-  if (/village|town|house|home|street|neighbourhood/.test(description)) props.add("house");
-  if (/city|urban|street|road|traffic|car|vehicle|market/.test(description)) { props.add("road"); props.add("car"); props.add("lamp"); }
-  if (/bicycle|cycle|cycling/.test(description)) props.add("bicycle");
-  if (/hospital|clinic|school|station|building/.test(description)) props.add("house");
-  if (/road|street|walkway|sidewalk/.test(description)) { props.add("road"); props.add("lamp"); }
+  const has = (re) => re.test(description);
+  if (has(/forest|jungle|park|mountain|hill|nature|village|outdoor|field|garden|tree/)) { props.add("tree"); props.add("bird"); }
+  if (has(/village|town|house|home|neighbourhood|school|hospital|clinic|station|building/)) { props.add("house"); props.add("fence"); }
+  if (has(/city|urban|street|road|traffic|car|vehicle|market/)) { props.add("road"); props.add("car"); props.add("lamp"); props.add("sign"); }
+  if (has(/bicycle|cycle|cycling/)) props.add("bicycle");
+  if (has(/river|lake|sea|ocean|waterfall|water bank|shore/)) { props.add("water"); props.add("bridge"); }
+  if (has(/camp|camping|tent|wilderness/)) { props.add("tent"); props.add("tree"); props.add("bird"); }
+  if (has(/park|garden|bus stop|waiting/)) props.add("bench");
+  if (has(/road|street|walkway|sidewalk/)) { props.add("road"); props.add("lamp"); }
   if (!props.size) { props.add("tree"); props.add("bird"); }
   return {
     shot: "manifest-scene-" + scene.scene_number,
