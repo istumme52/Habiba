@@ -36,6 +36,18 @@ function bicycle() {
   g.add(box(1.1,.06,.06,metal,0,.82,0),box(.06,.68,.06,metal,-.3,.82,0),box(.06,.58,.06,metal,.32,.8,0),box(.42,.09,.12,seat,-.32,1.18,0),box(.48,.06,.06,metal,.85,1.18,0));
   return g;
 }
+function motorcycle() {
+  const g=new THREE.Group(), metal=mat("#3e4852"), body=mat("#bd493f"), rubber=mat("#25282c"), chrome=mat("#aeb7bd");
+  for(const x of [-.72,.72]) {
+    const wheel=new THREE.Mesh(new THREE.TorusGeometry(.38,.075,7,18),rubber);
+    wheel.position.set(x,.42,0); wheel.rotation.y=Math.PI/2; wheel.castShadow=true; g.add(wheel);
+    g.add(cyl(.08,.08,.16,chrome,x,.42,0,10));
+  }
+  g.add(box(1.15,.12,.16,metal,0,.76,0),sphere(.28,body,-.08,1.02,0),box(.58,.12,.3,mat("#242b32"),.35,1.02,0));
+  g.add(box(.5,.08,.28,mat("#343a40"),-.48,.95,0),box(.12,.55,.12,metal,.55,1.18,0));
+  g.add(box(.62,.07,.08,chrome,.52,1.42,0),sphere(.13,mat("#f4d58a"),-.72,.9,0));
+  return g;
+}
 function bird() {
   const g=new THREE.Group(), wing=mat("#343943");
   g.add(sphere(.18,wing,0,0,0),box(.55,.06,.1,wing,-.28,.12,0),box(.55,.06,.1,wing,.28,.12,0));
@@ -84,7 +96,7 @@ function water() {
   const plane=new THREE.Mesh(new THREE.PlaneGeometry(18,32),blue); plane.rotation.x=-Math.PI/2; plane.position.y=.08; g.add(plane);
   return g;
 }
-const factories={tree,house,lamp,car,bicycle,bird,road,tent,bridge,fence,bench,sign,water};
+const factories={tree,house,lamp,car,bicycle,motorcycle,bird,road,tent,bridge,fence,bench,sign,water};
 export function createSceneProps(scene) {
   const root=new THREE.Group(); root.name="storyboard-scene-props";
   const groups={};
@@ -95,7 +107,7 @@ export function createSceneProps(scene) {
   }
   scene.add(root);
   const layout={
-    tree:(s,r)=>[s*(8+r*2),0,12+r*5], house:(s,r)=>[s*11,0,20+r*8],
+    tree:(s,r)=>[s*(8+r*2),0,12+r*5], motorcycle:(s)=>[s*5.2,0,16], house:(s,r)=>[s*11,0,20+r*8],
     lamp:(s,r)=>[s*5.5,0,10+r*14], car:(s)=>[s*4.8,0,18],
     bicycle:(s)=>[s*4.5,0,13], bird:(s,r)=>[s*(3+r*2),6+r,9+r*5],
     road:()=>[0,0,22],tent:(s)=>[s*8,0,17],bridge:()=>[0,0,25],
@@ -108,7 +120,7 @@ export function createSceneProps(scene) {
       const side=i%2===0?-1:1, row=Math.floor(i/2);
       const offset=layout[kind](side,row); o.position.set(...offset);
       if(kind==="car") o.rotation.y=side<0?-.16:Math.PI+.16;
-      if(kind==="bicycle") o.rotation.y=side<0?-.35:Math.PI+.35;
+      if(kind==="bicycle") o.rotation.y=side<0?-.35:Math.PI+.35;\n      if(kind==="motorcycle") o.rotation.y=side<0?-.25:Math.PI+.25;
       if(kind==="house"||kind==="tent"||kind==="bench") o.rotation.y=side<0?-.25:Math.PI+.25;
       if(kind==="water"||kind==="bridge") o.rotation.y=0;
     });
