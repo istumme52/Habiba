@@ -33,6 +33,12 @@ assert.ok(open.props.includes("motorcycle"));
 assert.ok(open.props.includes("water"));
 assert.ok(open.props.includes("bridge"));
 
+const running = structuredClone(manifest);
+running.scenes[0].action = "The hero runs away from danger";
+const runFrame = manifestFrameState(12, running);
+assert.equal(runFrame.actors[0].opts.mode, "run");
+assert.ok(runFrame.actors[0].opts.stride > 1);
+
 const silent = structuredClone(manifest);
 silent.scenes[0].dialogue = [];
 assert.notEqual(manifestFrameState(0, silent).actors[0].opts.expr, "talkOpen");
