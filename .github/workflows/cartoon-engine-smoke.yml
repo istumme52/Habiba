@@ -58,6 +58,7 @@ jobs:
           node --check Kit/engine/Web/paint.js
           node --check Kit/engine/render.mjs
           node --check Kit/engine/Web/manifest_runtime.js
+          node Kit/engine/Web/test_manifest_runtime.mjs
           node --check Kit/engine/ai/prepare_storyboard.mjs
           node --check Kit/engine/ai/plan_story.mjs
           node Kit/engine/ai/plan_story.mjs --self-test
