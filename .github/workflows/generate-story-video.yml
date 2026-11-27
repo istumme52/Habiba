@@ -32,12 +32,12 @@ jobs:
     timeout-minutes: 45
     env:
       AI_API_KEY: ${{ secrets.AI_API_KEY }}
-      AI_MODEL: ${{ secrets.AI_MODEL }}
-      AI_API_URL: ${{ secrets.AI_API_URL }}
+      AI_MODEL: ${{ secrets.AI_MODEL || 'gemini-3.8-flash' }}
+      AI_API_URL: ${{ secrets.AI_API_URL || 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions' }}
       TTS_API_KEY: ${{ secrets.TTS_API_KEY }}
-      TTS_API_URL: ${{ secrets.TTS_API_URL }}
-      TTS_MODEL: ${{ secrets.TTS_MODEL }}
-      TTS_VOICE: ${{ secrets.TTS_VOICE }}
+      TTS_API_URL: ${{ secrets.TTS_API_URL || 'https://generativelanguage.googleapis.com/v1beta/interactions' }}
+      TTS_MODEL: ${{ secrets.TTS_MODEL || 'gemini-3.8-flash-tts' }}
+      TTS_VOICE: ${{ secrets.TTS_VOICE || 'Kore' }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -68,9 +68,6 @@ jobs:
       - name: Validate required secrets
         run: |
           test -n "$AI_API_KEY" || { echo "Missing repository secret AI_API_KEY"; exit 2; }
-          test -n "$AI_MODEL" || { echo "Missing repository secret AI_MODEL"; exit 2; }
-          test -n "$TTS_MODEL" || { echo "Missing repository secret TTS_MODEL"; exit 2; }
-          test -n "$TTS_VOICE" || { echo "Missing repository secret TTS_VOICE"; exit 2; }
 
       - name: Generate storyboard, narration and MP4
         env:
