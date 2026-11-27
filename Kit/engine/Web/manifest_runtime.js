@@ -36,7 +36,8 @@ export function manifestFrameState(frame, manifest) {
   const local = clamp((f - scene.start_frame) / Math.max(1, scene.frame_count - 1));
   const ids = Array.isArray(scene.character_ids) ? scene.character_ids.slice(0, 4) : [];
   const chars = new Map((manifest.characters || []).map((c) => [c.id, c]));
-  const moving = /walk|run|climb|travel|move|approach|leave|chase/i.test(scene.action || "");
+  const running = /run|sprint|flee|escape|chase|rush/i.test(scene.action || "");
+  const moving = running || /walk|climb|travel|move|approach|leave/i.test(scene.action || "");
   const actors = ids.map((id, i) => {
     const character = chars.get(id) || { id, name: id };
     const x = (i - (ids.length - 1) / 2) * 2.8;
@@ -48,7 +49,7 @@ export function manifestFrameState(frame, manifest) {
       : /fear|scared|afraid/i.test(scene.action || "") ? "strain"
       : /happy|laugh|smile|joy/i.test(scene.action || "") ? "smile" : "neutral";
     const opts = { expr: expression, seed: hash(id) % 997, blink: Math.floor((f + i * 17) % 97) === 0, light: -2.2, tilt: Math.sin(f * 0.035 + i) * 1.2 };
-    if (moving) { opts.mode = "walk"; opts.phase = (f - scene.start_frame) / 12 + i * 0.4; }
+    if (moving) { opts.mode = running ? "run" : "walk"; opts.phase = (f - scene.start_frame) / (running ? 8 : 12) + i * 0.4; opts.stride = running ? 1.12 : 1; }
     if (/point|show|indicate/i.test(scene.action || "")) opts.armR = "point";
     if (/wave|greet/i.test(scene.action || "")) opts.armR = "up";
     return { id: "manifest-" + id, kind, outfit, outfitKey: character.id, pos:[x + Math.sin(local * Math.PI) * (moving ? 1.1 : 0), 14 + (i % 2) * 0.8], dir:[0, moving ? -1 : 1], opts, scale: ids.length > 2 ? 0.82 : 1, pull:0.45 };
