@@ -11,9 +11,9 @@ TITLE="${4:-episode}"
 [[ "$DURATION" =~ ^[0-9]+$ ]] && (( DURATION >= 15 && DURATION <= 600 )) || { echo "ERROR: duration must be 15-600 whole seconds." >&2; exit 2; }
 [[ "$TITLE" =~ ^[A-Za-z0-9._-]+$ ]] || { echo "ERROR: title may contain only letters, numbers, dot, underscore and hyphen." >&2; exit 2; }
 : "${AI_API_KEY:?Set AI_API_KEY in the environment}"
-: "${AI_MODEL:=gemini-3.8-flash}"
-: "${TTS_MODEL:=gemini-3.8-flash-tts}"
-: "${TTS_VOICE:=Kore}"
+export AI_MODEL="${AI_MODEL:-gemini-3.8-flash}"
+export TTS_MODEL="${TTS_MODEL:-gemini-3.8-flash-tts}"
+export TTS_VOICE="${TTS_VOICE:-Kore}"
 if [[ -z "${TTS_API_KEY:-}" && -z "${AI_API_KEY:-}" ]]; then
   echo "ERROR: set TTS_API_KEY or AI_API_KEY." >&2; exit 2
 fi
