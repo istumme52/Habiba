@@ -4,7 +4,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-const DEFAULT_URL = "https://api.openai.com/v1/chat/completions";
+const DEFAULT_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
 
 function parseArgs(argv) {
   const out = {};
@@ -90,9 +90,8 @@ async function main() {
   if (!language) throw new Error("--language cannot be empty");
 
   const apiKey = process.env.AI_API_KEY;
-  const model = process.env.AI_MODEL;
+  const model = process.env.AI_MODEL || "gemini-3.8-flash";
   if (!apiKey) throw new Error("AI_API_KEY is not set. Use an environment variable or GitHub Secret; never commit it.");
-  if (!model) throw new Error("AI_MODEL is not set. Choose a model supported by your endpoint.");
   const endpoint = process.env.AI_API_URL || DEFAULT_URL;
 
   const system = [
