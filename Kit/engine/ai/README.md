@@ -66,12 +66,16 @@ The script renders all frames at 1080×1920 / 30 fps, generates procedural music
 
 ## Offline tests
 
+Run the planner, manifest, TTS extraction and audio pipeline checks before using paid API calls:
+
 ```bash
 node ai/plan_story.mjs --self-test
 node ai/storyboard_to_manifest.mjs --self-test
 node ai/generate_voice.mjs --self-test
 python3 audio/test_story_audio.py
 ```
+
+The manifest validator rejects duplicate character IDs, unknown scene actors or dialogue speakers, empty dialogue lines, malformed sound-effect cues, unsupported frame rates and inconsistent scene-duration totals. The CI workflow also renders representative frames and exports a one-second synthetic MP4 smoke-test fixture; that fixture verifies the export pipeline, not a finished custom episode.
 
 ## Current boundaries
 
