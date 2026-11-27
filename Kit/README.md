@@ -46,12 +46,10 @@ The output is `out/episode.mp4` (1080×1920, 30 fps). Scene mood and sound-effec
 
 You can start a cloud render from the GitHub website without running Node.js or FFmpeg on your Android phone.
 
-1. In the repository, open **Settings → Secrets and variables → Actions** and add these repository secrets:
-   - `AI_API_KEY`: key for the storyboard Chat Completions provider.
-   - `AI_MODEL`: a model supported by that provider.
-   - `TTS_MODEL`: a speech model supported by your TTS endpoint.
-   - `TTS_VOICE`: a voice supported by that endpoint.
-   - Optional: `TTS_API_KEY`, `AI_API_URL`, `TTS_API_URL`.
+1. In the repository, open **Settings → Secrets and variables → Actions** and add only this required repository secret:
+   - `AI_API_KEY`: your Google AI Studio Gemini API key.
+   - No separate TTS key is required. By default, story planning uses `gemini-3.8-flash`; narration uses `gemini-3.8-flash-tts` and the `Kore` voice.
+   - Optional model/endpoint overrides: `AI_MODEL`, `AI_API_URL`, `TTS_MODEL`, `TTS_VOICE`, `TTS_API_URL`.
 2. Open the repository's **Actions** tab.
 3. Select **Generate story video**, then choose **Run workflow**.
 4. Enter the story idea, duration (15–600 seconds), language and output title.
