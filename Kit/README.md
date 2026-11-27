@@ -9,7 +9,7 @@ A vertical 9:16 cartoon-video toolkit with a fixed example and an AI-assisted st
 - `engine/ai/storyboard_to_manifest.mjs`: assigns exact 30-fps frame ranges to scenes.
 - `engine/ai/generate_voice.mjs`: generates narration/dialogue audio through a compatible TTS endpoint.
 - `engine/Web/manifest_runtime.js`: maps scene timing, camera, lighting, character actions and scene-description keywords to the bundled renderer.
-- `engine/Web/scene_props.js`: provides reusable low-poly 3D trees, houses, road markings, street lamps, cars, bicycles and birds; the runtime selects relevant props from each storyboard scene.
+- `engine/Web/scene_props.js`: provides reusable low-poly 3D trees, houses, road markings, street lamps, cars, bicycles, birds, tents, bridges, fences, benches, signs and water; the runtime selects relevant props from each storyboard scene.
 - `engine/build_storyboard_video.sh`: renders the storyboard, creates scene-based procedural music/SFX, mixes narration and exports MP4.
 - `engine/audio/`: procedural sound generation, mixing and loudness processing.
 - `engine/render.mjs`: Playwright frame/still/test-page renderer.
@@ -52,4 +52,4 @@ The included `story.js` example is a fixed 1,254-frame timeline (41.8 seconds); 
 
 ## Honest scope
 
-New storyboards can drive scene timing, camera framing/movement, lighting presets and consistent stylized 2D character cards with everyday clothing. A small reusable low-poly 3D prop library (trees, houses, roads, lamps, cars, bicycles and birds) is selected from scene descriptions and placed around the bundled world. This is not yet a full scene generator: custom AI-generated locations, detailed interiors, context-specific architectural sets, full 3D character rigs and lip-sync are not implemented. Props are stylized placeholders and may need manual art direction for production-quality shots. Procedural audio is a synthesized approximation, not licensed music or recorded sound effects. AI API credentials are read from environment variables; never commit them.
+New storyboards can drive scene timing, camera framing/movement, lighting presets and consistent stylized 2D character cards with everyday clothing. A reusable low-poly 3D prop library (trees, houses, roads, lamps, cars, bicycles, birds, tents, bridges, fences, benches, signs and water) is selected from scene descriptions and placed around the bundled world; these are still stylized set pieces, not fully generated location geometry. This is not yet a full scene generator: custom AI-generated locations, detailed interiors, context-specific architectural sets, full 3D character rigs and lip-sync are not implemented. Props are stylized placeholders and may need manual art direction for production-quality shots. Procedural audio is a synthesized approximation, not licensed music or recorded sound effects. AI API credentials are read from environment variables; never commit them.
