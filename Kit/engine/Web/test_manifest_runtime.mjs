@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
-import { manifestFrameState } from "./manifest_runtime.js";
+import fs from "node:fs/promises";
+const runtimeSource = await fs.readFile(new URL("./manifest_runtime.js", import.meta.url), "utf8");
+const runtimeUrl = "data:text/javascript;base64," + Buffer.from(runtimeSource).toString("base64");
+const { manifestFrameState } = await import(runtimeUrl);
 
 const manifest = {
   manifest_version: 1,
