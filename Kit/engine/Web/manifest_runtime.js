@@ -42,7 +42,12 @@ export function manifestFrameState(frame, manifest) {
     const x = (i - (ids.length - 1) / 2) * 2.8;
     const kind = moving ? "side" : "front";
     const outfit = palette(character.id + "|" + (character.outfit || character.description || ""));
-    const opts = { expr: /fear|scared|afraid/i.test(scene.action || "") ? "strain" : /happy|laugh|smile|joy/i.test(scene.action || "") ? "smile" : "neutral", seed: hash(id) % 997, blink: 0, light: -2.2, tilt: Math.sin(f * 0.035 + i) * 1.2 };
+    const dialogueForActor = (scene.dialogue || []).some((line) => line.character_id === id && String(line.line || "").trim());
+    const mouthOpen = dialogueForActor && (Math.floor((f - scene.start_frame + (hash(id) % 5)) / 3) % 2 === 0);
+    const expression = dialogueForActor ? (mouthOpen ? "talkOpen" : "talkClosed")
+      : /fear|scared|afraid/i.test(scene.action || "") ? "strain"
+      : /happy|laugh|smile|joy/i.test(scene.action || "") ? "smile" : "neutral";
+    const opts = { expr: expression, seed: hash(id) % 997, blink: Math.floor((f + i * 17) % 97) === 0, light: -2.2, tilt: Math.sin(f * 0.035 + i) * 1.2 };
     if (moving) { opts.mode = "walk"; opts.phase = (f - scene.start_frame) / 12 + i * 0.4; }
     if (/point|show|indicate/i.test(scene.action || "")) opts.armR = "point";
     if (/wave|greet/i.test(scene.action || "")) opts.armR = "up";
