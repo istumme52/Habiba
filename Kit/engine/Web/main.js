@@ -75,6 +75,8 @@ const MAT = {
   mustard: triToon(ctex(P.grassTex(41, 512, "#d9b93c")), 10), paddy: triToon(ctex(P.grassTex(42, 512, "#7fa84a")), 10),
 };
 const world = []; // meshes that get inked
+// Register storyboard prop meshes for the normal/depth pass so they receive consistent outlines and depth.
+scene.getObjectByName("storyboard-scene-props")?.traverse((o) => { if (o.isMesh && !world.includes(o)) world.push(o); });
 const addW = (mesh, cast = true, recv = true) => { mesh.castShadow = cast; mesh.receiveShadow = recv; mesh.layers.set(0); scene.add(mesh); world.push(mesh); return mesh; };
 
 // ---------- world ----------
